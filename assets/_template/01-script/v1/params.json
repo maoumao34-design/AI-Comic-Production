@@ -15,6 +15,12 @@
     "notes": "文字编排建议 Claude/GPT，保留人工校对与改写（TASK-SPEC §8）"
   },
   "narration_language": "zh (待确认)",
+  "narration_target": {
+    "duration_sec_range": [60, 120],
+    "word_count_range": [210, 480],
+    "chars_per_sec": "3.5–4（中文口播）",
+    "rationale": "1–2 分钟单集 × 3.5–4 字/秒 ≈ 210–480 字；v1 第一稿落进此带可少返工。待单集时长规格最终确认后据此校准。"
+  },
   "est_duration_sec": null,
   "word_count": null,
   "retained_dialogues_count": null,
