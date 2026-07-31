@@ -1,0 +1,28 @@
+{
+  "step": "01-script",
+  "episode": "EP-XX",
+  "version": "v1",
+  "date": "YYYY-MM-DD",
+  "source": {
+    "primary": "english_docx",
+    "reference": "chinese_docx",
+    "episode_primary_title": "<英文版本集标题>",
+    "episode_reference_title": "<中文参考本集标题>"
+  },
+  "model": {
+    "name": "<claude|gpt|...>",
+    "temperature": null,
+    "notes": "文字编排建议 Claude/GPT，保留人工校对与改写（TASK-SPEC §8）"
+  },
+  "narration_language": "zh (待确认)",
+  "est_duration_sec": null,
+  "word_count": null,
+  "retained_dialogues_count": null,
+  "beats_count": null,
+  "adaptation": {
+    "boundary_confirmed": false,
+    "policy_default": "保守：仅必要口语化，不改情节/不删关键对白",
+    "changes": []
+  },
+  "open_specs": ["narration_language", "duration", "aspect_ratio", "adaptation_boundary"]
+}
