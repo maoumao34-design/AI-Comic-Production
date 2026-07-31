@@ -1,7 +1,7 @@
-# 可视化产品 · 后端 Job/Task API 契约（草案 v0.1）
+# 可视化产品 · 后端 Job/Task API 契约（草案 v0.2）
 
 > 前后端对接契约草案。作者：ComfyUI 平台集成工程师（后端 owner）。
-> 对齐依据：[PIPELINE-DESIGN.md](../PIPELINE-DESIGN.md) §1–§5（7 步状态机 / checkpoint 协议 / 版本归档 / 平台对接 / 失败重试）、总控的 per-step checkpoint 契约（待总控定稿后对齐）、各步内容数据模型（编剧 01/02、图像视频 03/04/05、后期 06/07 各自定义，本文只定**通用外壳**）。
+> 对齐依据：[PIPELINE-DESIGN.md](../PIPELINE-DESIGN.md) §1–§5（7 步状态机 / checkpoint 协议 / 版本归档 / 平台对接 / 失败重试）、总控的 per-step checkpoint 契约（**decision 动作词已定稿对齐，见 §2.3**）、各步内容数据模型（编剧 01/02 **已交**、图像视频 03/04/05 与后期 06/07 待交；本文只定**通用外壳**，见 §5）。
 > **状态：草案，供前端工程师、总控、PM 评审；不改 main，走 PR。** 本文用 REST 描述，字段稳定后再补 OpenAPI。
 
 ---
@@ -74,7 +74,13 @@
   "params_override": { "seed": 999, "prompt_patch": "..." },  // regenerate/revise 时可带
   "at": "..." }
 ```
-> `action` 语义对齐总控的 checkpoint 协议（PIPELINE-DESIGN §2）。最终动作词以**总控定稿的 checkpoint 契约**为准，本文先用 approve/revise/rollback/regenerate 占位。
+> `action` 语义**已按总控定稿锁定**（2026-07-31，对齐 PIPELINE-DESIGN §2）：
+> - `approve` ✅ → 归档为 latest，**推进下一步**
+> - `revise` ✏️ → 带用户具体修改意见（哪句旁白/哪个镜头/哪个参数）**重跑当前步**（不推进）
+> - `regenerate` 🔄 → 不指定改动、换参数/seed **重跑当前步**（不推进）
+> - `rollback` ↩️ → 回**上一步** checkpoint 重做（当前版本保留归档）
+>
+> 只有 `approve` 推进；`revise`/`regenerate` 都重跑当前步（区别=revise 带编辑意见、regenerate 纯换参）；`rollback` 退上一步。每次 decision 记可回溯字段（动作 + 修改意见/新参数 + 操作人 + 时间）进 `meta.md`/`params.json`。
 
 ---
 
@@ -122,7 +128,7 @@ assets/<集号>/<步骤>-<名称>/latest    → 指向当前通过版本（软�
 ### 4.4 决策（✅/✏️/↩️/🔄）= 推进流水线的唯一入口
 | 方法 路径 | 说明 |
 |---|---|
-| `POST /episodes/{episode_id}/steps/{step}/decision` | 提交 Decision（§2.3）。后端据 `action`：approve→归档为 latest 并进下一步；revise→带 note/参数重跑本步出新版；rollback→回到上一步重做；regenerate→换参重跑本步。返回新的 run/step 状态。 |
+| `POST /episodes/{episode_id}/steps/{step}/decision` | 提交 Decision（§2.3，语义已锁定）。后端据 `action`：approve→归档为 latest 并进下一步；revise→带 note 重跑当前步出新版；regenerate→换参/seed 重跑当前步；rollback→回上一步重做（当前版本保留归档）。返回新的 run/step 状态。**失败/重生超阈值（PIPELINE-DESIGN §5，默认 3 次）→ 暂停并 escalation（不无限重跑）。** |
 
 ### 4.5 健康 / 可观测（对齐能力强化重点「可观测」）
 | 方法 路径 | 说明 |
@@ -137,11 +143,11 @@ assets/<集号>/<步骤>-<名称>/latest    → 指向当前通过版本（软�
 ## 5. 各步内容 schema（通用外壳 + 步主定义）
 
 后端对 `StepVersion.content` 只做通用外壳约束；**具体字段由该步 owner 定**，后端按其 schema 校验/存储：
-- 01 解说词、02 分镜表 → 编剧分镜（已认领内容数据模型）
-- 03 一致性资产、04 关键帧、05 分段视频 → 图像视频生成执行
-- 06 配音字幕、07 成片 → 后期合成
+- 01 解说词、02 分镜表 → 编剧分镜：✅ **已交** `docs/CONTENT-SCHEMA-01-02.md`（分支 `script/content-schema-01-02`）
+- 03 一致性资产、04 关键帧、05 分段视频 → 图像视频生成执行：⏳ 待交
+- 06 配音字幕、07 成片 → 后期合成：⏳ 交付中
 
-> **请各步 owner 把 content schema 贴出来/PR 进来**，后端据此定校验。通用外壳（episode/step/version/status/artifacts/params/meta）由本文锁定。
+> 各步 owner 把 content schema PR 进来后，后端据此定校验。通用外壳（episode/step/version/status/artifacts/params/meta）由本文锁定。
 
 ---
 
@@ -166,8 +172,8 @@ retry(job_id, new_params) -> 换参重跑（失败分类：内容不符/平台�
 ---
 
 ## 8. 待对齐 / 待确认（请评审）
-1. **checkpoint 动作词与流程**：以总控定稿的 per-step checkpoint 契约为准（本文先用 approve/revise/rollback/regenerate 占位）。
-2. **各步 content schema**：等编剧/图像视频/后期给出，后端接入校验。
+1. ~~checkpoint 动作词与流程~~ ✅ **已对齐总控定稿**（approve/revise/rollback/regenerate，见 §2.3）。
+2. **各步 content schema**：编剧 01/02 ✅ 已交；图像视频 03/04/05、后期 06/07 待交，后端接入校验。
 3. **delivery 规格**（画幅/时长/语言/导出）→ 影响 05/06/07 参数默认值；未定前用占位。
 4. **平台 key**：03+ 真实生成的前置；未到之前后端只跑骨架 + 占位产物（不伪造）。
 5. **鉴权/多用户**：MVP 假设单用户（maozh2），部署形态定了再补。
