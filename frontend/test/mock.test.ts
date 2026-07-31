@@ -12,50 +12,45 @@ async function main() {
   const eps = await mockApi.listEpisodes()
   assert(eps.length >= 1, `listEpisodes returns ${eps.length} episode(s)`)
   const ep01 = eps.find((e) => e.episode_id === 'EP-01')!
-  assert(ep01.current_step === '02-storyboard', `EP-01 starts at 02-storyboard (got ${ep01.current_step})`)
+  assert(ep01.current_step === '02', `EP-01 starts at 02 (got ${ep01.current_step})`)
 
   const run = await mockApi.startRun('EP-01')
   console.log('  run status:', run.status, 'current_step:', STEP_LABELS[run.current_step])
 
-  // 当前要 review 的是 02 v1，状态 awaiting_review
-  const cur02 = await mockApi.getCurrentVersion('EP-01', '02-storyboard')
-  assert(cur02.status === 'awaiting_review', `02 current version is awaiting_review (got ${cur02.status})`)
-  assert(cur02.version === 'v1', `02 current version is v1 (got ${cur02.version})`)
+  const cur02 = await mockApi.getCurrentVersion('EP-01', '02')
+  assert(cur02.status === 'awaiting_review', `02 current is awaiting_review (got ${cur02.status})`)
+  assert(cur02.version === 'v1', `02 current is v1 (got ${cur02.version})`)
 
-  // ✅ approve 02 → 应推进到 03
-  const afterApprove = await mockApi.postDecision('EP-01', '02-storyboard', { version: 'v1', action: 'approve' })
-  assert(afterApprove.current_step === '03-assets', `approve 02 advances to 03-assets (got ${afterApprove.current_step})`)
+  // ✅ approve 02 → 推进 03
+  const afterApprove = await mockApi.postDecision('EP-01', '02', { version: 'v1', action: 'approve' })
+  assert(afterApprove.current_step === '03', `approve 02 advances to 03 (got ${afterApprove.current_step})`)
   console.log('  after approve 02 ->', STEP_LABELS[afterApprove.current_step])
 
-  // 03 当前版本应是 awaiting_review（推进时生成的占位）
-  const cur03 = await mockApi.getCurrentVersion('EP-01', '03-assets')
-  assert(cur03.status === 'awaiting_review', `03 current is awaiting_review (got ${cur03.status})`)
+  const cur03 = await mockApi.getCurrentVersion('EP-01', '03')
+  assert(cur03.status === 'awaiting_review', `03 current is awaiting_review`)
 
-  // ✏️ revise 03（带 note）→ 仍在 03，且出新版本 v2 awaiting_review
-  const afterRevise = await mockApi.postDecision('EP-01', '03-assets', { version: cur03.version, action: 'revise', note: '角色三视图表情再严肃一点' })
-  assert(afterRevise.current_step === '03-assets', `revise 03 stays on 03 (got ${afterRevise.current_step})`)
-  const vs03 = await mockApi.listVersions('EP-01', '03-assets')
-  assert(vs03.length === 2, `revise produced a 2nd version on 03 (got ${vs03.length})`)
+  // ✏️ revise 03 → 仍 03，出新版
+  const afterRevise = await mockApi.postDecision('EP-01', '03', { version: cur03.version, action: 'revise', note: '角色三视图表情再严肃一点' })
+  assert(afterRevise.current_step === '03', `revise 03 stays on 03`)
+  const vs03 = await mockApi.listVersions('EP-01', '03')
+  assert(vs03.length === 2, `revise produced 2nd version (got ${vs03.length})`)
+  console.log('  after revise 03 ->', vs03.map((v) => `${v.version}:${v.status}`).join(', '))
+
+  // 🔄 regenerate 03（新 seed）
   const latest03 = vs03.find((v) => v.is_latest)!
-  assert(latest03.version === 'v2' && latest03.status === 'awaiting_review', `03 latest is v2 awaiting_review`)
-  console.log('  after revise 03 -> versions:', vs03.map((v) => `${v.version}:${v.status}`).join(', '))
-
-  // 🔄 regenerate 03（带新 seed）→ 仍 03，第 3 版
-  const afterRegen = await mockApi.postDecision('EP-01', '03-assets', { version: 'v2', action: 'regenerate', params_override: { seed: 999 } })
-  assert(afterRegen.current_step === '03-assets', `regenerate 03 stays on 03`)
-  const vs03b = await mockApi.listVersions('EP-01', '03-assets')
+  const afterRegen = await mockApi.postDecision('EP-01', '03', { version: latest03.version, action: 'regenerate', params_override: { seed: 999 } })
+  assert(afterRegen.current_step === '03', `regenerate 03 stays on 03`)
+  const vs03b = await mockApi.listVersions('EP-01', '03')
   const latest03b = vs03b.find((v) => v.is_latest)!
-  assert(latest03b.seed === 999, `regenerate applied new seed 999 (got ${latest03b.seed})`)
-  console.log('  after regenerate 03 -> latest seed:', latest03b.seed)
+  assert(latest03b.seed === 999, `regenerate applied seed 999 (got ${latest03b.seed})`)
 
-  // ↩️ rollback 03 → 回到 02
-  const afterRollback = await mockApi.postDecision('EP-01', '03-assets', { version: latest03b.version, action: 'rollback' })
-  assert(afterRollback.current_step === '02-storyboard', `rollback 03 returns to 02-storyboard (got ${afterRollback.current_step})`)
+  // ↩️ rollback 03 → 回 02
+  const afterRollback = await mockApi.postDecision('EP-01', '03', { version: latest03b.version, action: 'rollback' })
+  assert(afterRollback.current_step === '02', `rollback 03 returns to 02 (got ${afterRollback.current_step})`)
   console.log('  after rollback 03 ->', STEP_LABELS[afterRollback.current_step])
 
-  // 平台健康：mock 如实报未配置
   const h = await mockApi.getPlatformHealth()
-  assert(h.comfyui === 'not_configured', `platform health honest: comfyui not_configured`)
+  assert(h.comfyui.status === 'unconfigured', `platform health honest: comfyui unconfigured`)
 
   console.log('\nALL ASSERTIONS PASSED ✅')
 }

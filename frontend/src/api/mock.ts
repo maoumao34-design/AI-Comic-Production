@@ -65,7 +65,7 @@ class MockApi implements ComicApi {
       const latest = vs.find((v) => v.is_latest)
       return { step, status: latest?.status ?? (STEP_ORDER.indexOf(step) < STEP_ORDER.indexOf(ep.current_step) ? 'approved' : 'pending'), latest_version: latest?.version }
     })
-    run.status = ep.current_step === '07-final' && this.versions['07-final'].some((v) => v.episode_id === episodeId && v.status === 'approved') ? 'done' : 'paused_at_checkpoint'
+    run.status = ep.current_step === '07' && this.versions['07'].some((v) => (v as StepVersion).episode_id === episodeId && (v as StepVersion).status === 'approved') ? 'done' : 'paused_at_checkpoint'
     return run
   }
 
@@ -76,7 +76,7 @@ class MockApi implements ComicApi {
   async createEpisode(input: { episode_id: string; title: string }): Promise<Episode> {
     await delay(150)
     if (this.episodes.some((e) => e.episode_id === input.episode_id)) throw new Error(`episode ${input.episode_id} 已存在`)
-    const e: Episode = { episode_id: input.episode_id, title: input.title, status: 'draft', current_step: '01-script', created_at: now(), updated_at: now() }
+    const e: Episode = { episode_id: input.episode_id, title: input.title, status: 'draft', current_step: '01', created_at: now(), updated_at: now() }
     this.episodes.push(e)
     return structuredClone(e)
   }
@@ -183,7 +183,12 @@ class MockApi implements ComicApi {
   async getPlatformHealth(): Promise<PlatformHealth> {
     await delay(100)
     // mock：后端未就绪，如实报「未配置」（不伪造已连接）
-    return { comfyui: 'not_configured', video_model: 'not_configured', elevenlabs: 'not_configured' }
+    return {
+      comfyui: { status: 'unconfigured', detail: 'mock 未配置（后端未联调）' },
+      video_models: { status: 'unconfigured', detail: 'mock 未配置' },
+      elevenlabs: { status: 'unconfigured', detail: 'mock 未配置' },
+      overall: 'degraded',
+    }
   }
 }
 

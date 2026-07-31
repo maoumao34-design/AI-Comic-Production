@@ -132,7 +132,7 @@ export default function App() {
           <span className={`badge ${USING_MOCK ? 'mock' : 'live'}`}>{USING_MOCK ? 'MOCK 后端' : 'LIVE 后端'}</span>
           {currentEpisode && <span className="ep-tag">{currentEpisode.episode_id} · {currentEpisode.title}</span>}
           {run && <span className={`st st-${run.status}`}>run: {run.status}</span>}
-          {health && <span className="muted">平台: {Object.entries(health).map(([k, v]) => `${k[0].toUpperCase()}=${v}`).join(' · ')}</span>}
+          {health && <span className="muted">平台: {Object.entries(health).map(([k, v]) => `${k}=${typeof v === 'string' ? v : (v as { status: string }).status}`).join(' · ')}</span>}
         </div>
       </header>
 

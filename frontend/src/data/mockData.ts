@@ -12,7 +12,7 @@ export const SEED_EPISODES: Episode[] = [
     episode_id: 'EP-01',
     title: '第1集 · Serena 身份暴露起点',
     status: 'in_progress',
-    current_step: '02-storyboard',
+    current_step: '02',
     created_at: '2026-07-31T16:00:00Z',
     updated_at: '2026-07-31T17:05:00Z',
   },
@@ -20,7 +20,7 @@ export const SEED_EPISODES: Episode[] = [
     episode_id: 'EP-02',
     title: '第2集 · 暗流涌动',
     status: 'draft',
-    current_step: '01-script',
+    current_step: '01',
     created_at: '2026-07-31T16:05:00Z',
     updated_at: '2026-07-31T16:05:00Z',
   },
@@ -28,9 +28,9 @@ export const SEED_EPISODES: Episode[] = [
 
 /** EP-01 的各步版本（mock 归档）。01 已通过；02 正在 awaiting_review。 */
 export const SEED_VERSIONS: Record<StepId, StepVersion[]> = {
-  '01-script': [
+  '01': [
     {
-      episode_id: 'EP-01', step: '01-script', version: 'v1', is_latest: true, status: 'approved',
+      episode_id: 'EP-01', step: '01', version: 'v1', is_latest: true, status: 'approved',
       model: 'claude-sonnet', seed: 101,
       params: { temperature: 0.7, narration_language: 'zh' },
       artifacts: [P('解说词 v1', '/assets/EP-01/01-script/v1/narration.md')],
@@ -55,9 +55,9 @@ export const SEED_VERSIONS: Record<StepId, StepVersion[]> = {
       created_at: '2026-07-31T16:20:00Z', duration_ms: 4200, failure: null,
     },
   ],
-  '02-storyboard': [
+  '02': [
     {
-      episode_id: 'EP-01', step: '02-storyboard', version: 'v1', is_latest: true, status: 'awaiting_review',
+      episode_id: 'EP-01', step: '02', version: 'v1', is_latest: true, status: 'awaiting_review',
       model: 'claude-sonnet', seed: 202,
       params: { source_narration_version: 'v1' },
       artifacts: [P('分镜表 v1', '/assets/EP-01/02-storyboard/v1/storyboard.md')],
@@ -77,18 +77,18 @@ export const SEED_VERSIONS: Record<StepId, StepVersion[]> = {
       created_at: '2026-07-31T17:00:00Z', duration_ms: 5600, failure: null,
     },
   ],
-  '03-assets': [],
-  '04-keyframes': [],
-  '05-clips': [],
-  '06-voice-sub': [],
-  '07-final': [],
+  '03': [],
+  '04': [],
+  '05': [],
+  '06': [],
+  '07': [],
 }
 
 /** 给"重生/修改"产生的新版本占位内容 */
 export function draftVersionContent(step: StepId): unknown {
   switch (step) {
-    case '01-script':
-      return { ...(SEED_VERSIONS['01-script'][0].content as object), beats_count: 3, one_line_premise: '（重生草稿）Serena 身份暴露起点 · 换参重跑版本' }
+    case '01':
+      return { ...(SEED_VERSIONS['01'][0].content as object), beats_count: 3, one_line_premise: '（重生草稿）Serena 身份暴露起点 · 换参重跑版本' }
     default:
       return { note: `${step} 重生草稿（占位产物）`, pending_schema: true }
   }

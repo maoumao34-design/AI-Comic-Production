@@ -1,34 +1,19 @@
 // 通用数据模型 —— 严格对齐 docs/BACKEND-API-CONTRACT.md §2（通用外壳）。
 // 各步 content 的具体 schema 由该步 owner 定义（见 CONTENT-SCHEMA-*.md），此处用联合类型占位。
 
-/** 步骤 id（与归档目录名一致） */
-export type StepId =
-  | '01-script'
-  | '02-storyboard'
-  | '03-assets'
-  | '04-keyframes'
-  | '05-clips'
-  | '06-voice-sub'
-  | '07-final'
+/** 步骤 id（与后端 step.status / contract §2 一致：01..07；归档目录名 01-script 等是另一回事） */
+export type StepId = '01' | '02' | '03' | '04' | '05' | '06' | '07'
 
-export const STEP_ORDER: StepId[] = [
-  '01-script',
-  '02-storyboard',
-  '03-assets',
-  '04-keyframes',
-  '05-clips',
-  '06-voice-sub',
-  '07-final',
-]
+export const STEP_ORDER: StepId[] = ['01', '02', '03', '04', '05', '06', '07']
 
 export const STEP_LABELS: Record<StepId, string> = {
-  '01-script': '01 · 剧本准备',
-  '02-storyboard': '02 · 分场分镜',
-  '03-assets': '03 · 一致性资产',
-  '04-keyframes': '04 · 关键帧',
-  '05-clips': '05 · 分段视频',
-  '06-voice-sub': '06 · 配音字幕',
-  '07-final': '07 · 后期合成',
+  '01': '01 · 剧本准备',
+  '02': '02 · 分场分镜',
+  '03': '03 · 一致性资产',
+  '04': '04 · 关键帧',
+  '05': '05 · 分段视频',
+  '06': '06 · 配音字幕',
+  '07': '07 · 后期合成',
 }
 
 /** 集状态 */
@@ -122,9 +107,10 @@ export interface RunInfo {
   started_at: string
 }
 
-/** 平台健康（§4.5） */
+/** 平台健康（§4.5）；后端返回每个平台 {status,detail} + overall */
 export interface PlatformHealth {
-  comfyui: 'ok' | 'degraded' | 'down' | 'not_configured'
-  video_model: 'ok' | 'degraded' | 'down' | 'not_configured'
-  elevenlabs: 'ok' | 'degraded' | 'down' | 'not_configured'
+  comfyui: { status: string; detail?: string }
+  video_models: { status: string; detail?: string }
+  elevenlabs: { status: string; detail?: string }
+  overall?: string
 }
