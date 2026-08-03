@@ -1,4 +1,4 @@
-# 可视化产品 · 后端 Job/Task API 契约（草案 v0.2）
+# 可视化产品 · 后端 Job/Task API 契约（草案 v0.3）
 
 > 前后端对接契约草案。作者：ComfyUI 平台集成工程师（后端 owner）。
 > 对齐依据：[PIPELINE-DESIGN.md](../PIPELINE-DESIGN.md) §1–§5（7 步状态机 / checkpoint 协议 / 版本归档 / 平台对接 / 失败重试）、总控的 per-step checkpoint 契约（**decision 动作词已定稿对齐，见 §2.3**）、各步内容数据模型（编剧 01/02 **已交**、图像视频 03/04/05 与后期 06/07 待交；本文只定**通用外壳**，见 §5）。
@@ -137,6 +137,25 @@ assets/<集号>/<步骤>-<名称>/latest    → 指向当前通过版本（软�
 | `GET /queue` | 任务队列：进行中/排队/最近失败（model/seed/耗时/失败原因） |
 
 > 平台 key 缺失时，`/health/platforms` 如实报「未配置」，后端**不伪造已连接**（铁律）。MVP 阶段 03+ 真实生成需 key 到位。
+
+### 4.6 实测响应形状（v0.3 — 前后端联调已对齐，以 backend 实现为准）
+
+> 本节固化 v0.2 实现的**实际**响应外壳与字段；前端 `fe/mvp-shell` 已按此适配并通过真后端联调。与前文有冲突时以本节为准。
+
+- **所有响应包 envelope**（不返裸值）：
+  - `GET /episodes` → `{ episodes: Episode[] }`
+  - `POST /episodes` / `GET /episodes/{id}` → `{ episode: Episode }`
+  - `POST /episodes/{id}/runs` / `GET /runs/{id}` → `{ run: Run }`
+  - `GET .../steps/{step}/current` / `GET .../steps/{step}/versions/{version}` → `{ version: StepVersion }`
+  - `GET .../steps/{step}/versions` → `{ versions: StepVersion[] }`
+  - `POST .../steps/{step}/decision` → `{ result: { run_id, status, current_step, current_version } }`（**瘦身返回**；要完整 run 用 `run_id` 再 `GET /runs/{run_id}`）
+  - `GET /health/platforms` → `PlatformHealth`（见下，无 envelope）
+  - `GET /queue` → `{ queue: Job[] }`
+- **step id = 短形式 `01`..`07`**（与 §2.2 示例 `"step":"04"` 一致；归档目录仍用全名 `04-keyframes`，由后端映射，前端不感知）。
+- **`Run.steps` 是对象（按 step id 键），不是数组**：`{ "01": { status, versions:[], current_version, fail_count }, ... }`。
+- **`is_latest`** 只在 `approve` 后标 `true`（§3 latest 指针语义）；当前待 review 的版本走 `GET .../current`（status=`awaiting_review`）。
+- **PlatformHealth（嵌套）**：`{ comfyui:{status,detail}, video_models:{status,detail}, elevenlabs:{status,detail}, overall }`，每项 `status` ∈ `unconfigured|ok|degraded|down`（MVP：`unconfigured`，不伪造）。
+- 写操作幂等：前端可带 `client_request_id`（后端目前透传、不强制）。
 
 ---
 
