@@ -24,7 +24,7 @@
 {
   "action": "approve | revise | regenerate | rollback",
   "note": "string  (revise 必填：修改意见)",
-  "new_params": "object (regenerate 可选：新参数/seed)",
+  "params_override": "object (regenerate 可选：新参数/seed，与前后端实现一致)",
   "operator": "string",
   "ts": "ISO8601"
 }
