@@ -51,10 +51,30 @@ VITE_API_BASE=http://<后端>/api/v1
 
 前端只依赖 [`ComicApi`](src/api/types.ts) 一个接口；mock 与真实实现都实现它，切换不改组件代码。
 
+## 部署（GitHub Pages）
+
+线上站：**https://maoumao34-design.github.io/AI-Comic-Production/**（MVP，内置 mock 后端，完整占位循环可演示）。
+
+前端是静态产物，部署到 GitHub Pages 项目站点需带子路径 `base`。仓库的 `gh-pages` 分支即构建产物（含 `.nojekyll`），Pages 已配置为「分支 `gh-pages` / 根目录」。
+
+重新发布（重建并推 `gh-pages`）：
+
+```bash
+cd frontend
+# 默认走 mock（完整可演示）；接真后端另加 VITE_USE_MOCK=false VITE_API_BASE=https://<后端>/api/v1
+VITE_BASE=/AI-Comic-Production/ npm run build
+# 把 dist/ 作为孤儿分支 gh-pages 强推
+cp -r dist ../dist-deploy && cd ../dist-deploy
+git init -b gh-pages && touch .nojekyll && git add -A && git commit -m "deploy: pages build"
+git push -f origin gh-pages
+```
+
+> mock 后端是会话级内存态（刷新重置）；真后端持久化与平台联调已在本地验证（见 `test/real.test.ts`），上真后端只需把 `gh-pages` 构建换成 `VITE_USE_MOCK=false` + `VITE_API_BASE`。
+
 ## MVP 范围（对齐 PER-STEP-UI-SPEC §6）
 
 - ✅ 顶栏：集号 + run 状态 + 平台健康
 - ✅ 对话区 stub：选/建集 → 发起/继续 run；步骤快跳；活动记录
 - ✅ 工作区通用 StepView：步号/状态 + 按类型渲染（01 beats、02 shots、03–07 通用）+ ✅/✏️/🔄/↩️ + 版本浏览器
 - ✅ decision 语义：approve 推进 / revise 带意见重跑当前步 / regenerate 换参重跑 / rollback 回上一步
-- ⏳ 后续：03/04/05、06/07 专用视图（等各步 schema 定稿）、版本对比、实时进度（SSE/WS）、部署上线
+- ✅ deployment：GitHub Pages 公网可访问（见上节「部署」）
