@@ -1,0 +1,13 @@
+{
+  "name": "ai-comic-visualization-backend",
+  "version": "0.2.0-mvp",
+  "description": "AI 漫剧可视化产品后端骨架（MVP）：7 步流水线状态机 + Job/Task API + 版本归档 + 占位产物。对齐 docs/BACKEND-API-CONTRACT.md v0.2。",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "private": true
+}
