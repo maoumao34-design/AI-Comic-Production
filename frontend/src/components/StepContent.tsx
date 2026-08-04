@@ -1,6 +1,11 @@
 import type { StepVersion } from '../types'
 import { Script01View } from './steps/Script01View'
 import { Storyboard02View } from './steps/Storyboard02View'
+import { Assets03View } from './steps/Assets03View'
+import { Keyframes04View } from './steps/Keyframes04View'
+import { Clips05View } from './steps/Clips05View'
+import { Voice06View } from './steps/Voice06View'
+import { Final07View } from './steps/Final07View'
 import { GenericStepView } from './steps/GenericStepView'
 
 /** 按步骤类型 switch 渲染该步 schema 产物（PER-STEP-UI-SPEC §4） */
@@ -10,6 +15,16 @@ export function StepContent({ version }: { version: StepVersion }) {
       return <Script01View version={version} />
     case '02':
       return <Storyboard02View version={version} />
+    case '03':
+      return <Assets03View version={version} />
+    case '04':
+      return <Keyframes04View version={version} />
+    case '05':
+      return <Clips05View version={version} />
+    case '06':
+      return <Voice06View version={version} />
+    case '07':
+      return <Final07View version={version} />
     default:
       return <GenericStepView version={version} />
   }

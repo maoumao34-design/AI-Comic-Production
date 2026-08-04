@@ -84,12 +84,112 @@ export const SEED_VERSIONS: Record<StepId, StepVersion[]> = {
   '07': [],
 }
 
-/** 给"重生/修改"产生的新版本占位内容 */
-export function draftVersionContent(step: StepId): unknown {
+/** 步骤归档目录名（对齐 PIPELINE assets/ 约定） */
+export const STEP_ARCHIVE_DIR: Record<StepId, string> = {
+  '01': '01-script',
+  '02': '02-storyboard',
+  '03': '03-assets',
+  '04': '04-keyframes',
+  '05': '05-clips',
+  '06': '06-voice-sub',
+  '07': '07-final',
+}
+
+/** 给 mock 推进/重生用的逐步 schema 占位 content */
+export function placeholderContent(episodeId: string, step: StepId): unknown {
   switch (step) {
     case '01':
-      return { ...(SEED_VERSIONS['01'][0].content as object), beats_count: 3, one_line_premise: '（重生草稿）Serena 身份暴露起点 · 换参重跑版本' }
+      return { ...(SEED_VERSIONS['01'][0].content as object), one_line_premise: '（草稿）Serena 身份暴露起点' }
+    case '02':
+      return { ...(SEED_VERSIONS['02'][0].content as object) }
+    case '03':
+      return {
+        subjects: [
+          {
+            subject_type: 'character',
+            subject_id: 'serena',
+            views: ['front', 'side', 'back'],
+            prompt: 'Serena, elegant dinner dress, consistent face, vertical 9:16 ref sheet',
+            consistency_check: { passed: true, issues: [] },
+            status: 'draft',
+          },
+          {
+            subject_type: 'scene',
+            subject_id: 'banquet_hall',
+            views: ['wide'],
+            prompt: 'Luxury banquet hall, warm chandelier light',
+            status: 'draft',
+          },
+        ],
+      }
+    case '04':
+      return {
+        keyframes: [
+          { kf_id: 'kf1', source_shot_id: 's1', shot: { 景别: '中景', angle: 'eye-level', composition: 'rule-of-thirds' }, asset_refs: ['serena'], characters_in_frame: ['Serena', 'James'], prompt: 'Serena holds wine glass at banquet' },
+          { kf_id: 'kf2', source_shot_id: 's2', shot: { 景别: '近景', angle: 'high', composition: 'center' }, asset_refs: ['serena', 'banquet_hall'], characters_in_frame: ['Serena'], prompt: 'Invitation card slips onto table' },
+        ],
+      }
+    case '05':
+      return {
+        provider: 'unset',
+        segments: [
+          { seg_id: 'seg1', duration_s: 6, keyframe_refs: { first: 'kf1', last: 'kf1' }, prompt: { shot: '中景', action: 'raises glass', emotion: 'calm' }, selection: { decision: 'adopt', reason: 'opening beat' } },
+          { seg_id: 'seg2', duration_s: 5, keyframe_refs: { first: 'kf2', last: 'kf2' }, prompt: { shot: '近景', action: 'card falls', emotion: 'shock' }, selection: { decision: 'adopt', reason: 'turning point' } },
+        ],
+        note: '多平台候选未锁定（Seedance/Kling/Wan/Comfy）——先讨论再定 provider。',
+      }
+    case '06':
+      return {
+        voiceover: {
+          tts: 'elevenlabs',
+          model: 'eleven_multilingual_v2',
+          voice_id: '<pending>',
+          language: 'en',
+          speed: 1.0,
+          audio: { url: `assets/${episodeId}/06-voice-sub/v1/output_voiceover.mp3`, duration_ms: 95000 },
+        },
+        subtitle_track: {
+          format: 'srt',
+          language: 'en',
+          burn_in: true,
+          file_url: `assets/${episodeId}/06-voice-sub/v1/output_subs.srt`,
+          cues: [
+            { index: 1, start_ms: 0, end_ms: 6000, text: 'At the glittering banquet, no one knew who she really was.' },
+            { index: 2, start_ms: 6000, end_ms: 11000, text: 'Until the invitation slipped onto the table.' },
+          ],
+        },
+        script_ref: `assets/${episodeId}/01-script/latest/`,
+        clips_ref: `assets/${episodeId}/05-clips/latest/`,
+      }
+    case '07':
+      return {
+        cut: {
+          duration_ms: 95000,
+          aspect: '9:16',
+          resolution: [1080, 1920],
+          fps: 30,
+          video: { url: `assets/${episodeId}/07-final/v1/output_final.mp4`, container: 'mp4', vcodec: 'h264', acodec: 'aac' },
+        },
+        tracks: {
+          voiceover_ref: `assets/${episodeId}/06-voice-sub/latest/`,
+          clips_ref: `assets/${episodeId}/05-clips/latest/`,
+          music: [{ url: '', label: 'BGM', gain_db: -18 }],
+          sfx: [],
+        },
+        subtitle: { burn_in: true, language: 'en' },
+        edit_project: { tool: 'ffmpeg', project_file_url: `assets/${episodeId}/07-final/v1/edit_project.json` },
+        delivery_spec_id: '<pending>',
+      }
     default:
-      return { note: `${step} 重生草稿（占位产物）`, pending_schema: true }
+      return { note: `${step} 占位`, pending_schema: true }
   }
+}
+
+/** 给"重生/修改"产生的新版本占位内容 */
+export function draftVersionContent(step: StepId, episodeId = 'EP-01'): unknown {
+  if (step === '01') {
+    return { ...(SEED_VERSIONS['01'][0].content as object), beats_count: 3, one_line_premise: '（重生草稿）Serena 身份暴露起点 · 换参重跑版本' }
+  }
+  const base = placeholderContent(episodeId, step) as Record<string, unknown>
+  return { ...base, note: `${step} 重生草稿（占位产物）` }
 }
