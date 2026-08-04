@@ -21,9 +21,11 @@
 
 > 所有 agent 接到任务后，请先读 TASK-SPEC / PIPELINE-DESIGN / COLLABORATION，再开始工作。专项需求以 `TASK-SPEC.md` 和后续项目 issue 为准。
 
-## 原始参考图
+## 原始参考材料
 
 👉 **[references/](./references)** — maozh2 提供的任务截图原图（需求来源凭证）
+
+👉 **[references/scripts/](./references/scripts)** — 英文 30 集正式制作源 + 中文 30 集剧情参考（DOCX；成片全英文，中文仅供参考）
 
 当对需求、成片形式或制作流程有疑问时，可回查这些原图核对，再决定是否更新文档。
 
