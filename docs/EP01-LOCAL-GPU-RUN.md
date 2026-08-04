@@ -19,33 +19,50 @@
 
 ## 1. 本机环境（有 GPU 的机器）
 
-1. Clone：`https://github.com/maoumao34-design/AI-Comic-Production`（含本 runbook 的分支/PR 合入后用 main，或先 `git checkout zongkong/ep01-local-gpu-pack` / 合入后的 main）。
+1. Clone 并切到含 CLI 的分支（PR #8 合 main 前）：
+   ```bash
+   git clone https://github.com/maoumao34-design/AI-Comic-Production
+   cd AI-Comic-Production
+   git fetch origin
+   git checkout agent/comfyui/30fedd2d   # 含内容包 + ep01-cli + Comfy 胶水
+   ```
 2. 安装并启动 **本地 ComfyUI**（本机显卡），默认 `http://127.0.0.1:8188`。
-3. 配置本地入口（勿把 Key 提交进 git）：
-   - `COMFYUI_BASE_URL=http://127.0.0.1:8188`（或你的本机端口）
-   - 本地跑一般**不需要** Cloud API Key；若胶水仍读 `COMFYUI_API_KEY`，可留空。
-4. 优先用仓库 CLI（§1.5）。若 CLI/工作流尚未合入，可先手工在 ComfyUI 加载等价工作流，按 §2 清单出图并落到归档路径。
+3. 把检查点模型放进 ComfyUI `models/checkpoints/`，记下真实文件名。
+4. 配置本地入口（PowerShell 示例；勿把 Key 提交进 git）：
+   ```powershell
+   $env:COMFYUI_BASE_URL = "http://127.0.0.1:8188"
+   $env:COMFYUI_CKPT = "your-model.safetensors"   # 或每次 --ckpt 传入
+   ```
+   本地跑**不需要** Cloud API Key。
 
-## 1.5 本地 CLI 接入约定（工程师实现；导演本机调用）
+## 1.5 本地 CLI（真实入口）
 
-目标体验（maozh2 确认）：到有显卡机器后，**一条/少数命令**即可按步生成并落盘，不必改 Prompt 源文件。
-
-### 期望命令面（工程师实现后填真实入口；占位名可改，语义勿改）
+目标体验（maozh2 确认）：到有显卡机器后，**少数命令**即可按步生成并落盘。
 
 ```bash
-# 健康检查：本地 ComfyUI 可达
-<repo-cli> doctor --base-url http://127.0.0.1:8188
+# 0) 可选：只检查会生成哪些 subject，不连 Comfy、不出图
+node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --dry-run
 
-# 按步跑 EP01（推荐一次一步，便于 checkpoint）
-<repo-cli> run --episode EP-01 --step 03 --version v1
-<repo-cli> run --episode EP-01 --step 04 --version v1   # 需 03 已有 outputs
-<repo-cli> run --episode EP-01 --step 05 --version v1
-<repo-cli> run --episode EP-01 --step 06 --version v1
-<repo-cli> run --episode EP-01 --step 07 --version v1
+# 1) 健康检查：本地 ComfyUI 可达
+node scripts/ep01-cli.mjs doctor --base-url http://127.0.0.1:8188
 
-# 可选：连续跑生成步，但仍在每步结束后暂停等人审（默认）
-<repo-cli> run --episode EP-01 --from 03 --to 07 --pause-each-step
+# 2) 按步跑 EP01（推荐一次一步，便于 checkpoint）
+node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --ckpt your-model.safetensors
+# 单 subject 重跑：
+node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --subject char/serena --ckpt your-model.safetensors
+
+node scripts/ep01-cli.mjs run --episode EP-01 --step 04 --version v1 --ckpt your-model.safetensors   # 需 03 已有 outputs
+
+# 05–07：命令面已留好；当前诚实返回 not_implemented（缺视频 API / TTS / 成片流水线），勿期望一键出片
+node scripts/ep01-cli.mjs run --episode EP-01 --step 05 --version v1
+node scripts/ep01-cli.mjs run --episode EP-01 --step 06 --version v1
+node scripts/ep01-cli.mjs run --episode EP-01 --step 07 --version v1
+
+# 可选：03→04 连续跑，每步结束后暂停等人审
+node scripts/ep01-cli.mjs run --episode EP-01 --from 03 --to 04 --pause-each-step --ckpt your-model.safetensors
 ```
+
+底层胶水（调试用）：`backend/scripts/comfy-health.mjs`、`backend/scripts/comfy-run-workflow.mjs`；工作流：`workflows/03-assets/character-sheet.api.json`。
 
 ### CLI 必须遵守
 
@@ -54,13 +71,13 @@
 | 读入 | `assets/EP-01/<step>/v1/prompt.md` + `params.json`（及上游锁定 outputs） |
 | 写出 | `assets/EP-01/<step>/v1/outputs/...`；更新同目录 `meta.md` / `output.md` 的文件清单与状态 |
 | 不跳审 | 不得在无 ✅ 时改写上游已通过版本；重生用新 `vN` 或同目录新 seed 记录进 `params.json` |
-| 不伪造 | 生成失败则标 `pending`/`failed`，禁止占位图冒充定稿 |
-| 环境 | 只读本机 `COMFYUI_BASE_URL`（及可选本地 dummy key）；**禁止**把 Cloud Key 写入仓库 |
+| 不伪造 | 生成失败则标 `pending`/`failed`，禁止占位图冒充定稿；05–07 未接线时明确 `not_implemented` |
+| 环境 | 只读本机 `COMFYUI_BASE_URL` / `COMFYUI_CKPT`（及可选 Key）；**禁止**把 Cloud Key 写入仓库 |
 
 ### 实现归属
 
-- **内容包 / 验收标准 / 本约定**：总控（本文件 + `assets/EP-01/03-assets|04-keyframes/...`）
-- **ComfyUI workflow JSON + `<repo-cli>` 胶水**：平台集成工程师（合入后把本节占位换成真实命令与路径）
+- **内容包 / 验收标准 / 本约定**：总控（`assets/EP-01/03-assets|04-keyframes/...`）
+- **ComfyUI workflow JSON + `scripts/ep01-cli.mjs`**：平台集成工程师（本分支）
 
 ## 2. 跑通顺序
 
@@ -116,7 +133,8 @@ TTS（ElevenLabs 或本机等价）+ 字幕 SRT；节奏对齐分镜 → checkpo
 - **不伪造**：缺图就标 pending；不要用占位图冒充定稿。
 - Cloud 路径仍可选（以后改主意再开）：Standard+ + custom_env 后由工程师健康检查；与本地路径二选一或并行。
 
-## 4. 已知缺口（不挡 Prompt 准备 / 不挡手工出图）
+## 4. 已知缺口
 
-- 本地 ComfyUI 工作流 JSON + `<repo-cli>`：**工程师交付后**，§1.5 占位换成真实命令；此前可手工出图按 §2 落盘。
+- **03 / 04**：本机 ComfyUI + `ep01-cli` 可跑；缺 GPU / 缺 checkpoint 文件则出不了图（不伪造）。
+- **05 视频 / 06 TTS / 07 成片**：CLI 入口已留，实现仍待视频模型 Key + TTS + 剪辑链路；在此之前请手工落盘或等下一迭代。
 - 成片目标时长 / 分辨率：仍 soft；草稿跟样片 9:16。

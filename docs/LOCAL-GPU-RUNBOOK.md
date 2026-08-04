@@ -1,6 +1,8 @@
 # 本机 GPU 跑通指南（Local ComfyUI）
 
-> 场景：运行时机器**没有**可达的远程 GPU / Comfy Cloud 付费 API；你在**另一台有显卡的机器**上 clone 本仓库，本机起 ComfyUI + 本仓库 backend，即可完成步骤 03（及后续 Comfy 相关步）的真实出图与归档。
+> 场景：运行时机器**没有**可达的远程 GPU / Comfy Cloud 付费 API；你在**另一台有显卡的机器**上 clone 本仓库，本机起 ComfyUI，用仓库 CLI 完成步骤 03/04 出图与归档。
+>
+> **首选入口**：[`docs/EP01-LOCAL-GPU-RUN.md`](./EP01-LOCAL-GPU-RUN.md)（内容包 + 验收 + `node scripts/ep01-cli.mjs`）。本文是底层胶水/单工作流调试补充。
 >
 > Owner：ComfyUI 平台集成工程师。密钥/路径只放本机环境变量，**不要贴群、不要提交仓库**。
 
@@ -68,7 +70,24 @@ curl http://127.0.0.1:8000/api/v1/health/platforms
 
 Prompt 文案见 [`prompts/EP-01/03-assets/PROMPT-PACK.md`](../prompts/EP-01/03-assets/PROMPT-PACK.md)。
 
-## 5. 提交一次 03 出图并归档
+## 5. 推荐：按内容包批量出 03（ep01-cli）
+
+```bash
+# 仓库根目录
+set COMFYUI_BASE_URL=http://127.0.0.1:8188
+node scripts/ep01-cli.mjs doctor
+node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --ckpt your-model.safetensors
+```
+
+读入 `assets/EP-01/03-assets/v1/{prompt.md,params.json}`，按 `subjects_planned` 逐个出图，落到：
+
+```
+assets/EP-01/03-assets/v1/outputs/<subject_id>/output.png
+```
+
+并更新同目录 `meta.md` / `output.md` / `params.json`（`images_generated`）。
+
+## 5b. 底层单次调试（comfy-run-workflow）
 
 ```bash
 cd backend
@@ -76,17 +95,11 @@ node scripts/comfy-run-workflow.mjs ^
   --workflow ../workflows/03-assets/character-sheet.api.json ^
   --episode EP-01 ^
   --step 03 ^
-  --subject char-heiress ^
-  --positive "comic character reference sheet of a young heiress, ..."
+  --subject char-serena ^
+  --positive "comic character reference sheet of Serena, ..."
 ```
 
-脚本会：
-
-1. `submit` → `wait` → `recover`（五件套）
-2. 写入 `data/assets/EP-01/03-assets/<version>/`（`prompt.md` / `params.json` / `meta.md` / `output*.png` / `comfy-history.json`）
-3. 更新该步 `latest` 指针说明
-
-把 `data/assets/...` 里通过人审的版本 **commit 到 git**（或打包回传），即可在无 GPU 的环境继续后续联调/验收。
+写入 `backend/data/assets/...`（调试用）。**正式归档以仓库根 `assets/EP-01/...` + ep01-cli 为准。**
 
 ## 6. 和可视化产品后端的关系
 
