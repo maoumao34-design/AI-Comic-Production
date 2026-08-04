@@ -1,11 +1,16 @@
 // engine.mjs — 可视化产品后端骨架（MVP）：7 步状态机 + 版本归档 + 占位产物
 // 零依赖（纯 Node ESM）。实现 BACKEND-API-CONTRACT v0.2 的核心闭环。
 // ComfyUI：platforms/comfyui.mjs 已接真实探活（设 COMFYUI_BASE_URL）；步骤产物默认仍占位，本机出图用 scripts/comfy-run-workflow.mjs。
-// 视频模型 / ElevenLabs：未配置时如实 unconfigured，不伪造已连接。
+// 视频模型 / ElevenLabs / 合成：入口已保留；未配置时如实 unconfigured，不伪造已连接。
+// 归档默认对齐仓库根 assets/（与接手 agent / ep01-cli 同源），可用 ASSETS_DIR 覆盖。
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import * as comfyui from "./platforms/comfyui.mjs";
+import * as video from "./platforms/video.mjs";
+import * as elevenlabs from "./platforms/elevenlabs.mjs";
+import * as compose from "./platforms/compose.mjs";
+import { platformMap, slotForStep, STEP_PLATFORM_SLOTS } from "./platforms/registry.mjs";
 
 // ---- 配置 ----
 const STEPS = [
@@ -21,9 +26,10 @@ const STEP_DIR = {
   "01": "01-script", "02": "02-storyboard", "03": "03-assets",
   "04": "04-keyframes", "05": "05-clips", "06": "06-voice-sub", "07": "07-final",
 };
+// 默认：仓库根 assets/（与 CLI / 总控约定一致），不再写 backend/data/assets
 const ASSETS_DIR = process.env.ASSETS_DIR
   ? path.resolve(process.env.ASSETS_DIR)
-  : path.join(import.meta.dirname, "data", "assets");
+  : path.join(import.meta.dirname, "..", "assets");
 const FAIL_THRESHOLD = Number(process.env.FAIL_THRESHOLD || 3); // PIPELINE §5
 
 // ---- 内存状态 ----
@@ -77,16 +83,26 @@ async function readArtifact(relPath) {
   try { return { abs: norm, buf: await fs.readFile(norm) }; } catch { return null; }
 }
 
-// ---- 占位产物生成（stub，不接真实平台）----
+// ---- 占位产物生成（stub；平台入口见 registry，不假装已真实出图）----
 function placeholderGen(episodeId, stepId, inputs = {}) {
   const step = STEPS.find((s) => s.id === stepId);
+  const slot = slotForStep(stepId);
   const seed = inputs.seed ?? Math.floor(Math.random() * 1e9);
-  const model = `<占位：${stepId} 平台模型未配置>`;
-  const params = { model, seed, ...(inputs.params_override || {}) };
+  const platformId = slot?.primary || (slot?.candidates?.[0] ?? null);
+  const model = platformId
+    ? `<占位：${platformId} 未真实调用>`
+    : `<占位：${stepId} 无外部生成平台>`;
+  const params = {
+    model, seed,
+    platform: platformId,
+    platform_slot: slot ? { primary: slot.primary, candidates: slot.candidates, status: slot.status } : null,
+    ...(inputs.params_override || {}),
+  };
   const note = inputs.note ? `\n\n## 用户修改意见\n${inputs.note}` : "";
-  const prompt = `# ${step.name}（步骤 ${stepId}）占位 Prompt\n\n集号：${episodeId}\n这是 MVP 占位产物，未接真实平台。${note}`;
+  const prompt = `# ${step.name}（步骤 ${stepId}）占位 Prompt\n\n集号：${episodeId}\n平台槽：${platformId || "none"}（${slot?.status || "none"}）\n这是可视化产品占位产物；真实生成走对应平台入口或 GPU CLI。${note}`;
   const meta =
-    `# ${step.name} v? meta\n\n- model: ${model}\n- seed: ${seed}\n- 生成方式: 占位桩（stub）\n- 真实平台: 未配置 key\n` +
+    `# ${step.name} v? meta\n\n- model: ${model}\n- seed: ${seed}\n- platform: ${platformId || "none"}\n` +
+    `- platform_status: ${slot?.status || "none"}\n- 生成方式: 占位桩（stub）\n- entry: ${slot?.entry || "n/a"}\n` +
     `- 耗时(ms): ${Math.floor(20 + Math.random() * 80)}\n- 生成时间: ${now()}\n`;
   // 每步给一个占位文本产物，结构示意（真实字段由各步 content schema 定）
   const contentShape = {
@@ -100,9 +116,9 @@ function placeholderGen(episodeId, stepId, inputs = {}) {
   }[stepId] || {};
   const outputs = [
     { filename: "output.json", type: "json", label: `${step.name} 产出（占位）`,
-      content: JSON.stringify({ episode_id: episodeId, step: stepId, content: contentShape, params }, null, 2) },
+      content: JSON.stringify({ episode_id: episodeId, step: stepId, platform: platformId, content: contentShape, params }, null, 2) },
   ];
-  return { prompt, params, meta, outputs, model, seed, content: contentShape };
+  return { prompt, params, meta, outputs, model, seed, content: contentShape, platform: platformId, platform_slot: slot };
 }
 
 // ---- 状态机 ----
@@ -120,6 +136,10 @@ async function runStep(run, stepId, inputs = {}) {
     episode_id: run.episode_id, step: stepId, version, is_latest: false,
     status: fail ? "failed" : "awaiting_review",
     model: gen.model, seed: gen.seed, params: gen.params,
+    platform: gen.platform || null,
+    platform_slot: gen.platform_slot
+      ? { primary: gen.platform_slot.primary, candidates: gen.platform_slot.candidates, status: gen.platform_slot.status, entry: gen.platform_slot.entry }
+      : null,
     artifacts: [], refs: [], archive_path: "", prompt_path: "", meta_path: "",
     content: gen.content, created_at: now(), duration_ms: dur_ms,
     failure: fail ? { code: "placeholder_forced_fail", reason: "MVP 占位：模拟失败以演示重试/暂停", retryable: true } : null,
@@ -262,13 +282,70 @@ export async function submitDecision(episodeId, stepId, decision) {
 }
 
 export async function health() {
-  // 铁律：不伪造「已连接平台」。Comfy 仅在 COMFYUI_BASE_URL 探活成功时报 ok。
-  const comfy = await comfyui.health();
-  const video_models = { status: "unconfigured", detail: "Seedance/Kling/Wan key 未配置" };
-  const elevenlabs = { status: "unconfigured", detail: "ElevenLabs key 未配置" };
-  const overall = comfy.status === "ok" ? "degraded" : "degraded"; // 其它平台未接 → overall 仍 degraded
-  return { comfyui: comfy, video_models, elevenlabs, overall };
+  // 铁律：不伪造「已连接平台」。各入口如实探活 / unconfigured。
+  const [comfy, video_models, tts, local_compose] = await Promise.all([
+    comfyui.health(),
+    video.health(),
+    elevenlabs.health(),
+    compose.health(),
+  ]);
+  const statuses = [comfy.status, video_models.status, tts.status, local_compose.status];
+  const overall = statuses.every((s) => s === "ok")
+    ? "ok"
+    : statuses.some((s) => s === "ok" || s === "degraded")
+      ? "degraded"
+      : "degraded";
+  return {
+    comfyui: comfy,
+    video_models,
+    elevenlabs: tts,
+    local_compose,
+    overall,
+    step_slots: STEP_PLATFORM_SLOTS,
+  };
 }
+export function getPlatformMap() { return platformMap(); }
 export function queueView() { return queue.slice(0, 20); }
 export async function artifact(relPath) { return readArtifact(relPath); }
-export const META = { STEPS, STEP_DIR, ASSETS_DIR, FAIL_THRESHOLD };
+
+/** 列出某集某步磁盘归档（含 outputs/），供接手 agent / FE 发现产物 */
+export async function listArchiveTree(episodeId, stepId) {
+  const stepDir = STEP_DIR[stepId];
+  if (!stepDir) throw { status: 400, message: "unknown step" };
+  const root = path.join(ASSETS_DIR, episodeId, stepDir);
+  const out = { episode_id: episodeId, step: stepId, root: `${episodeId}/${stepDir}/`, versions: [] };
+  let entries = [];
+  try { entries = await fs.readdir(root, { withFileTypes: true }); } catch { return out; }
+  for (const ent of entries.filter((e) => e.isDirectory()).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (ent.name === "latest") continue; // pointer dir, not a version archive
+    const verPath = path.join(root, ent.name);
+    const files = await walkRelFiles(verPath, `${episodeId}/${stepDir}/${ent.name}`);
+    out.versions.push({
+      version: ent.name,
+      archive_path: `${episodeId}/${stepDir}/${ent.name}/`,
+      files: files.map((rel) => ({
+        path: rel,
+        url: `/api/v1/artifacts?path=${encodeURIComponent(rel)}`,
+      })),
+    });
+  }
+  return out;
+}
+
+async function walkRelFiles(absDir, relPrefix) {
+  const acc = [];
+  async function walk(dir, rel) {
+    let ents = [];
+    try { ents = await fs.readdir(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of ents) {
+      const a = path.join(dir, e.name);
+      const r = `${rel}/${e.name}`.replace(/\\/g, "/");
+      if (e.isDirectory()) await walk(a, r);
+      else acc.push(r);
+    }
+  }
+  await walk(absDir, relPrefix);
+  return acc;
+}
+
+export const META = { STEPS, STEP_DIR, ASSETS_DIR, FAIL_THRESHOLD, STEP_PLATFORM_SLOTS };
