@@ -1,0 +1,27 @@
+{
+  "episode": "EP-01",
+  "step": "04-keyframes",
+  "version": "v1",
+  "created_at": "2026-08-04T06:50:00Z",
+  "author_agent": "漫剧制作总控",
+  "status": "draft_prompt_pack",
+  "source_storyboard": {
+    "path": "assets/EP-01/02-storyboard/v1/",
+    "version": "v1",
+    "shots": 16
+  },
+  "source_assets": {
+    "path": "assets/EP-01/03-assets/v1/",
+    "version": "v1",
+    "images_required": true
+  },
+  "aspect_ratio_draft": "9:16",
+  "schema": "docs/STEP-CONTENT-SCHEMA-03-04-05.md#04",
+  "keyframes_planned": [
+    "KF-S1", "KF-S2", "KF-S3", "KF-S4", "KF-S5", "KF-S6", "KF-S7", "KF-S8",
+    "KF-S9", "KF-S10", "KF-S11", "KF-S12", "KF-S13", "KF-S14", "KF-S15", "KF-S16"
+  ],
+  "images_generated": false,
+  "run_path": "local_gpu_preferred",
+  "decision": null
+}
