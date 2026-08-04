@@ -15,3 +15,9 @@
 | 06 | `06-制作指南-2.png` | “这是制作指南” | AI 漫剧制作流程指南 ②（工作流与进阶建议） |
 
 整理结果见根目录 [TASK-SPEC.md](../TASK-SPEC.md)。
+
+## 源剧本
+
+👉 **[scripts/](./scripts)** — 英文 30 集正式制作源 + 中文 30 集剧情参考（DOCX）
+
+详见 [scripts/README.md](./scripts/README.md)。制作约定：成片全英文；中文仅供参考。
