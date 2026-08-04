@@ -24,43 +24,42 @@
 3. 配置本地入口（勿把 Key 提交进 git）：
    - `COMFYUI_BASE_URL=http://127.0.0.1:8188`（或你的本机端口）
    - 本地跑一般**不需要** Cloud API Key；若胶水仍读 `COMFYUI_API_KEY`，可留空。
-4. 优先用仓库 CLI（§1.5）。若 CLI/工作流尚未合入，可先手工在 ComfyUI 加载等价工作流，按 §2 清单出图并落到归档路径。
+4. 用仓库 CLI（§1.5 / 工程师 PR #8）。亦可手工在 ComfyUI 加载 `workflows/03-assets/` 等价工作流，按 §2 清单出图并落到 `assets/` 归档路径。
 
-## 1.5 本地 CLI 接入约定（工程师实现；导演本机调用）
+## 1.5 本地 CLI 接入（工程师 PR #8 已落地；导演本机调用）
 
-目标体验（maozh2 确认）：到有显卡机器后，**一条/少数命令**即可按步生成并落盘，不必改 Prompt 源文件。
+目标体验（maozh2 确认）：到有显卡机器后，**少数命令**即可按步生成并落盘。  
+工程侧说明：`docs/LOCAL-GPU-RUNBOOK.md`（PR https://github.com/maoumao34-design/AI-Comic-Production/pull/8 ）。  
+内容包 + 人审标准：本文件 + `assets/EP-01/03-assets|04-keyframes/...`（PR #7）。
 
-### 期望命令面（工程师实现后填真实入口；占位名可改，语义勿改）
+### 当前可用命令（先打通 03；整集 01→07 下一迭代）
 
 ```bash
-# 健康检查：本地 ComfyUI 可达
-<repo-cli> doctor --base-url http://127.0.0.1:8188
+# 0) 起本地 ComfyUI 后
+export COMFYUI_BASE_URL=http://127.0.0.1:8188   # Windows: set / $env:
 
-# 按步跑 EP01（推荐一次一步，便于 checkpoint）
-<repo-cli> run --episode EP-01 --step 03 --version v1
-<repo-cli> run --episode EP-01 --step 04 --version v1   # 需 03 已有 outputs
-<repo-cli> run --episode EP-01 --step 05 --version v1
-<repo-cli> run --episode EP-01 --step 06 --version v1
-<repo-cli> run --episode EP-01 --step 07 --version v1
-
-# 可选：连续跑生成步，但仍在每步结束后暂停等人审（默认）
-<repo-cli> run --episode EP-01 --from 03 --to 07 --pause-each-step
+# 1) 按需改 workflows/03-assets/character-sheet.api.json 内 checkpoint 名
+cd backend
+node scripts/comfy-health.mjs
+node scripts/comfy-run-workflow.mjs --episode EP-01 --step 03 --subject char-heiress
+# 对其余 subject 按工程师文档 / params.json subjects_planned 逐个跑
 ```
 
-### CLI 必须遵守
+### CLI / 落盘必须遵守
 
 | 项 | 约定 |
 |---|---|
-| 读入 | `assets/EP-01/<step>/v1/prompt.md` + `params.json`（及上游锁定 outputs） |
-| 写出 | `assets/EP-01/<step>/v1/outputs/...`；更新同目录 `meta.md` / `output.md` 的文件清单与状态 |
-| 不跳审 | 不得在无 ✅ 时改写上游已通过版本；重生用新 `vN` 或同目录新 seed 记录进 `params.json` |
+| 读入 | 优先 `assets/EP-01/<step>/v1/prompt.md` + `params.json`（及上游锁定 outputs） |
+| 写出（人审归档） | 最终须在 **`assets/EP-01/<step>/v1/outputs/...`**；更新同目录 `meta.md` / `output.md` |
+| 工程缓存 | 若 CLI 暂写 `backend/data/assets/EP-01/...`，跑完**拷贝/同步**到上表 `assets/` 树再开 checkpoint |
+| 不跳审 | 不得在无 ✅ 时改写上游已通过版本；重生用新 `vN` 或新 seed 记入 `params.json` |
 | 不伪造 | 生成失败则标 `pending`/`failed`，禁止占位图冒充定稿 |
-| 环境 | 只读本机 `COMFYUI_BASE_URL`（及可选本地 dummy key）；**禁止**把 Cloud Key 写入仓库 |
+| 环境 | 只读本机 `COMFYUI_BASE_URL`；**禁止**把 Cloud Key 写入仓库 |
 
 ### 实现归属
 
-- **内容包 / 验收标准 / 本约定**：总控（本文件 + `assets/EP-01/03-assets|04-keyframes/...`）
-- **ComfyUI workflow JSON + `<repo-cli>` 胶水**：平台集成工程师（合入后把本节占位换成真实命令与路径）
+- **内容包 / 验收标准 / 路径契约**：总控（PR #7）
+- **ComfyUI workflow JSON + `backend/scripts/comfy-*.mjs`**：平台集成工程师（PR #8；整集一键后续迭代）
 
 ## 2. 跑通顺序
 
@@ -116,7 +115,8 @@ TTS（ElevenLabs 或本机等价）+ 字幕 SRT；节奏对齐分镜 → checkpo
 - **不伪造**：缺图就标 pending；不要用占位图冒充定稿。
 - Cloud 路径仍可选（以后改主意再开）：Standard+ + custom_env 后由工程师健康检查；与本地路径二选一或并行。
 
-## 4. 已知缺口（不挡 Prompt 准备 / 不挡手工出图）
+## 4. 已知缺口（不挡本机先跑 03）
 
-- 本地 ComfyUI 工作流 JSON + `<repo-cli>`：**工程师交付后**，§1.5 占位换成真实命令；此前可手工出图按 §2 落盘。
+- 整集一键（01→07）与全部 subject 批跑：工程师下一迭代；当前可按 §1.5 逐 subject 跑 03。
+- subject id 映射（工程侧如 `char-heiress` ↔ 内容包 `char/serena` 等）：出图后在 `output.md` 标明对应关系即可验收。
 - 成片目标时长 / 分辨率：仍 soft；草稿跟样片 9:16。
