@@ -3,7 +3,7 @@ import { Script01View } from './steps/Script01View'
 import { Storyboard02View } from './steps/Storyboard02View'
 import { Assets03View } from './steps/Assets03View'
 import { Keyframes04View } from './steps/Keyframes04View'
-import { Clips05View } from './steps/Clips05View'
+import { Segments05View } from './steps/Segments05View'
 import { Voice06View } from './steps/Voice06View'
 import { Final07View } from './steps/Final07View'
 import { GenericStepView } from './steps/GenericStepView'
@@ -20,7 +20,7 @@ export function StepContent({ version }: { version: StepVersion }) {
     case '04':
       return <Keyframes04View version={version} />
     case '05':
-      return <Clips05View version={version} />
+      return <Segments05View version={version} />
     case '06':
       return <Voice06View version={version} />
     case '07':

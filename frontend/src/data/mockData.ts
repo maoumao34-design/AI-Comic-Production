@@ -104,37 +104,58 @@ export function placeholderContent(episodeId: string, step: StepId): unknown {
       return { ...(SEED_VERSIONS['02'][0].content as object) }
     case '03':
       return {
+        step: '03-assets', episode: episodeId, version: 'v1',
         subjects: [
           {
-            subject_type: 'character',
-            subject_id: 'serena',
-            views: ['front', 'side', 'back'],
-            prompt: 'Serena, elegant dinner dress, consistent face, vertical 9:16 ref sheet',
+            subject_type: 'character', subject_id: 'serena', label: 'Serena', status: 'draft',
+            views: {
+              front: `/mock/assets/${episodeId}/03-assets/v1/outputs/serena/front.png`,
+              side: `/mock/assets/${episodeId}/03-assets/v1/outputs/serena/side.png`,
+              back: `/mock/assets/${episodeId}/03-assets/v1/outputs/serena/back.png`,
+            },
             consistency_check: { passed: true, issues: [] },
-            status: 'draft',
+            prompt: 'Serena, elegant dinner look, three-view character sheet, consistent face',
           },
           {
-            subject_type: 'scene',
-            subject_id: 'banquet_hall',
-            views: ['wide'],
-            prompt: 'Luxury banquet hall, warm chandelier light',
-            status: 'draft',
+            subject_type: 'scene', subject_id: 'banquet_hall', label: '高档晚宴厅', status: 'draft',
+            output: { url: `/mock/assets/${episodeId}/03-assets/v1/outputs/banquet_hall/hero.png`, type: 'image' },
+            consistency_check: { passed: true, issues: [] },
+          },
+          {
+            subject_type: 'prop', subject_id: 'invitation', label: '豪门请柬', status: 'draft',
+            output: { url: `/mock/assets/${episodeId}/03-assets/v1/outputs/invitation/closeup.png`, type: 'image' },
+            consistency_check: { passed: true, issues: [] },
           },
         ],
       }
     case '04':
       return {
+        step: '04-keyframes', episode: episodeId, version: 'v1',
         keyframes: [
-          { kf_id: 'kf1', source_shot_id: 's1', shot: { 景别: '中景', angle: 'eye-level', composition: 'rule-of-thirds' }, asset_refs: ['serena'], characters_in_frame: ['Serena', 'James'], prompt: 'Serena holds wine glass at banquet' },
-          { kf_id: 'kf2', source_shot_id: 's2', shot: { 景别: '近景', angle: 'high', composition: 'center' }, asset_refs: ['serena', 'banquet_hall'], characters_in_frame: ['Serena'], prompt: 'Invitation card slips onto table' },
+          { kf_id: 'kf1', source_shot_id: 's1', shot: { 景别: '中景', angle: 'eye-level', composition: 'Serena 端杯' }, asset_refs: ['serena', 'banquet_hall'], characters_in_frame: ['Serena', 'James'], output: { url: `/mock/assets/${episodeId}/04-keyframes/v1/outputs/kf1.png`, type: 'image' }, prompt: 'Serena holding wine glass at banquet' },
+          { kf_id: 'kf2', source_shot_id: 's2', shot: { 景别: '近景', angle: 'high', composition: '请柬滑落' }, asset_refs: ['invitation', 'serena'], characters_in_frame: ['Serena'], output: { url: `/mock/assets/${episodeId}/04-keyframes/v1/outputs/kf2.png`, type: 'image' }, prompt: 'invitation card sliding onto table' },
+          { kf_id: 'kf3', source_shot_id: 's4', shot: { 景别: '全景', angle: 'eye-level', composition: '离场背影' }, asset_refs: ['serena', 'banquet_hall'], characters_in_frame: ['Serena'], output: { url: `/mock/assets/${episodeId}/04-keyframes/v1/outputs/kf3.png`, type: 'image' }, prompt: 'Serena exiting banquet hall silhouette' },
         ],
       }
     case '05':
       return {
+        step: '05-segments', episode: episodeId, version: 'v1',
         provider: 'unset',
         segments: [
-          { seg_id: 'seg1', duration_s: 6, keyframe_refs: { first: 'kf1', last: 'kf1' }, prompt: { shot: '中景', action: 'raises glass', emotion: 'calm' }, selection: { decision: 'adopt', reason: 'opening beat' } },
-          { seg_id: 'seg2', duration_s: 5, keyframe_refs: { first: 'kf2', last: 'kf2' }, prompt: { shot: '近景', action: 'card falls', emotion: 'shock' }, selection: { decision: 'adopt', reason: 'turning point' } },
+          {
+            seg_id: 'seg1', duration_s: 6,
+            keyframe_refs: { first: 'kf1', last: 'kf2' },
+            prompt: { shot: '中景→近景', action: 'Serena 端杯，请柬滑落', dialogue: '', emotion: '平静中藏锋', sfx: 'glass clink, murmur' },
+            selection: { decision: 'pending', reason: '' },
+            output: { url: `/mock/assets/${episodeId}/05-clips/v1/outputs/seg1.mp4`, type: 'video' },
+          },
+          {
+            seg_id: 'seg2', duration_s: 7,
+            keyframe_refs: { first: 'kf2', last: 'kf3' },
+            prompt: { shot: '近景→全景', action: '一饮而尽离场', dialogue: 'Enjoy your evening.', emotion: '隐忍', sfx: 'footsteps, door' },
+            selection: { decision: 'pending', reason: '' },
+            output: { url: `/mock/assets/${episodeId}/05-clips/v1/outputs/seg2.mp4`, type: 'video' },
+          },
         ],
         note: '多平台候选未锁定（Seedance/Kling/Wan/Comfy）——先讨论再定 provider。',
       }
