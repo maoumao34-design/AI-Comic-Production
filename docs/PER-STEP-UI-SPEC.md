@@ -5,7 +5,7 @@
 > 对齐：[PIPELINE-DESIGN.md](../PIPELINE-DESIGN.md) §1–§3、后端 [BACKEND-API-CONTRACT.md](./BACKEND-API-CONTRACT.md)、各步 content schema（[CONTENT-SCHEMA-01-02.md](./CONTENT-SCHEMA-01-02.md) 等）、[CHECKPOINT-CONTRACT.md](./CHECKPOINT-CONTRACT.md)。
 > 状态：v0.1，MVP 聚焦；每步深描随各步 schema 定稿再迭代。
 >
-> 注：本文件为总控定稿的权威副本。`fe/mvp-shell` 分支早期曾由前端工程师代提交过一版（当时总控暂无 git 写权限），那版的 §5 decision 字段写的是 `new_params`，**已在此定稿版统一为 `params_override`**（与 `CHECKPOINT-CONTRACT.md`、前端 `types.ts`/`DecisionBar`、后端实现一致）。合并两分支时本文件为准。
+> 注：本文件为总控定稿的权威副本。`fe/mvp-shell` 分支早期曾由前端工程师代提交过一版（当时总控暂无 git 写权限），那版的 §5 decision 字段写的是 `new_params` / `ts`，**已在此定稿版统一为 `params_override`，且时间戳 `at` 由后端服务端打戳（前端不传 `ts`/`at`）**——对齐 [BACKEND-API-CONTRACT.md](./BACKEND-API-CONTRACT.md) §4.6 canonical 字段、前端 `types.ts`/`DecisionBar`、后端 `submitDecision`。合并两分支时本文件为准。
 
 ---
 
@@ -44,17 +44,23 @@ pending → running → awaiting_review →（ approve → 下一步
 
 ## 5. decision 字段（提交后端 `POST .../decision`）
 
+> Canonical 字段名以 [BACKEND-API-CONTRACT.md](./BACKEND-API-CONTRACT.md) §4.6 为准（后端 `submitDecision` 实读）。
+
 ```json
 {
   "version": "v3",
   "action": "approve | revise | regenerate | rollback",
   "note": "（revise 必填：具体修改意见）",
   "params_override": { "seed": 999 },
+  "operator": "maozh2",
   "client_request_id": "uuid（幂等）"
 }
 ```
 
-- 字段名 **`params_override`**：与 `CHECKPOINT-CONTRACT.md`、前端 `Decision.params_override`、后端实现一致（regenerate 可选，用来换 seed/参数）。
+- 字段名 **`params_override`**（不是 `new_params`）：与 BACKEND-API-CONTRACT §4.6、前端 `Decision.params_override`、后端 `submitDecision` 一致（regenerate/revise 可选，用来换 seed/参数）。后端**不读**请求体里的 `new_params`——若按旧名发送，换参会静默失效。
+- **时间戳 `at`**：由后端服务端打戳写入 decision 历史；前端**不传** `ts` / `at`（传了也会被忽略）。
+- **`operator`**：可选；后端可读，缺省 `maozh2`。
+- **`client_request_id`**：可选；后端目前透传、不强制（幂等预留）。
 - 语义对齐总控定稿的 4 动作（见 [CHECKPOINT-CONTRACT.md](./CHECKPOINT-CONTRACT.md)）：只有 `approve` 推进；`revise`/`regenerate` 重跑当前步（出新版，仍 `awaiting_review`）；`rollback` 回上一步（当前版本置 `superseded` 保留归档）。
 - 只在 `step.status = awaiting_review` 可提交；`running` 等状态后端返 409。
 
