@@ -108,7 +108,7 @@ export default function App() {
     setBusy(true)
     const ep = curVersion.episode_id
     const step = focusStep ?? curVersion.step
-    pushLog('user', `${action} · ${STEP_LABELS[step]}${note ? `：${note}` : ''}${paramsOverride?.seed != null ? `（seed=${paramsOverride.seed}）` : ''}`)
+    pushLog('user', `${action} · ${STEP_LABELS[step]}${note ? `：${note}` : ''}${paramsOverride?.seed != null ? `（seed=${paramsOverride.seed}）` : ''}${paramsOverride?.provider != null ? `（provider=${String(paramsOverride.provider)}）` : ''}`)
     try {
       const r = await api.postDecision(ep, step, { version: curVersion.version, action, note, params_override: paramsOverride })
       setRun(r)
@@ -154,7 +154,7 @@ export default function App() {
         </section>
         <section className="right">
           {curVersion ? (
-            <StepView current={curVersion} versions={versions} busy={busy} onDecision={onDecision} />
+            <StepView current={curVersion} versions={versions} busy={busy} health={health} onDecision={onDecision} />
           ) : (
             <div className="empty big">在左侧选择/新建一集并发起 run，工作区会展示当前 checkpoint。</div>
           )}

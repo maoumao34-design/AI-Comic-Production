@@ -1,7 +1,8 @@
 import type { StepVersion } from '../../types'
 import { STEP_LABELS } from '../../types'
+import { ArtifactGallery } from '../ArtifactGallery'
 
-/** 03–07 通用渲染：产物预览 + 参数/seed/参考图；content schema 待各步 owner 定稿。 */
+/** 兜底通用渲染：产物预览 + 参数/seed/参考图 */
 export function GenericStepView({ version }: { version: StepVersion }) {
   const c = version.content as { note?: string; pending_schema?: boolean }
   return (
@@ -14,19 +15,7 @@ export function GenericStepView({ version }: { version: StepVersion }) {
       {c?.note && <p className="muted">{c.note}</p>}
 
       <h4>产物（artifacts）</h4>
-      {version.artifacts.length === 0 ? (
-        <div className="empty">暂无产物（占位 · 等真实后端接入）</div>
-      ) : (
-        <div className="artifacts">
-          {version.artifacts.map((a, i) => (
-            <div key={i} className={`artifact ${a.type}`}>
-              <div className="ph">{a.type === 'image' ? '🖼️' : a.type === 'video' ? '🎬' : a.type === 'audio' ? '🔊' : '📄'}</div>
-              <div className="lbl">{a.label}</div>
-              <div className="url">{a.url}</div>
-            </div>
-          ))}
-        </div>
-      )}
+      <ArtifactGallery artifacts={version.artifacts} />
 
       <h4>参数 / 模型</h4>
       <div className="kv">

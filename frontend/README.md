@@ -19,12 +19,16 @@ frontend/
 │  │  └─ index.ts              # env 切换：VITE_USE_MOCK
 │  ├─ data/mockData.ts         # EP-01/02 占位数据（含 01 beats、02 shots）
 │  ├─ components/
-│  │  ├─ StepView.tsx          # 通用 StepView 外壳（Header/Content/Decision/Version）
-│  │  ├─ StepContent.tsx       # 按步骤类型 switch
+│  │  ├─ StepView.tsx          # 通用 StepView 外壳（平台槽位/Header/Content/Decision/Version/接手面板）
+│  │  ├─ StepContent.tsx       # 按步骤类型 switch（01–07 专用视图）
+│  │  ├─ PlatformSlotPanel.tsx # 每步 ComfyUI/视频模型/ElevenLabs 接入入口 + 健康态
+│  │  ├─ HandoffPanel.tsx      # archive/content/artifacts 接手 agent 可读
+│  │  ├─ ArtifactGallery.tsx   # 图/视频/音频产物预览
 │  │  ├─ DecisionBar.tsx       # ✅/✏️/🔄/↩️（revise 带修改意见、regenerate 带新 seed）
 │  │  ├─ VersionBrowser.tsx    # 版本列表 + 切换
 │  │  ├─ ChatPanel.tsx         # 对话区 stub（选/建集、发起 run、活动记录、步骤快跳）
-│  │  └─ steps/                # 01 解说词 / 02 分镜 / 03–07 通用 渲染
+│  │  └─ steps/                # 01–07 专用渲染
+│  ├─ platformSlots.ts         # 每步平台槽位表（05 多候选 discuss-first）
 │  ├─ App.tsx                  # 顶栏（集号+run 状态+平台健康）+ 左右布局 + 状态
 │  └─ index.css
 └─ test/mock.test.ts           # decision 状态机运行时测试

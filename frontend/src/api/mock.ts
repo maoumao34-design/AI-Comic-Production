@@ -8,7 +8,7 @@ import type {
   DecisionAction,
 } from '../types'
 import { STEP_ORDER } from '../types'
-import { SEED_EPISODES, SEED_VERSIONS, draftVersionContent } from '../data/mockData'
+import { SEED_EPISODES, SEED_VERSIONS, draftVersionContent, placeholderContent, STEP_ARCHIVE_DIR } from '../data/mockData'
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 const now = () => new Date().toISOString()
@@ -155,7 +155,12 @@ class MockApi implements ComicApi {
         status: 'awaiting_review',
         seed: d.action === 'regenerate' && d.params_override?.seed != null ? Number(d.params_override.seed) : (cur.seed ?? 0) + 7,
         params: { ...(cur.params ?? {}), ...(d.params_override ?? {}) },
-        content: draftVersionContent(step),
+        model: d.params_override?.provider != null ? String(d.params_override.provider) : cur.model,
+        content: (() => {
+          const base = draftVersionContent(step, episodeId) as Record<string, unknown>
+          if (d.params_override?.provider != null) base.provider = d.params_override.provider
+          return base
+        })(),
         created_at: now(),
         artifacts: cur.artifacts.map((a) => ({ ...a, label: a.label + ' (重生)' })),
         failure: null,
@@ -167,16 +172,47 @@ class MockApi implements ComicApi {
   }
 
   private placeholder(episodeId: string, step: StepId): StepVersion {
+    const dir = STEP_ARCHIVE_DIR[step]
+    const archive = `assets/${episodeId}/${dir}/v1/`
+    const arts =
+      step === '03' || step === '04'
+        ? [{ type: 'image' as const, url: `/${archive}output_preview.png`, label: `${step} preview (mock)` }]
+        : step === '05' || step === '07'
+          ? [{ type: 'video' as const, url: `/${archive}output_preview.mp4`, label: `${step} preview (mock)` }]
+          : step === '06'
+            ? [
+                { type: 'audio' as const, url: `/${archive}output_voiceover.mp3`, label: 'voiceover (mock)' },
+                { type: 'text' as const, url: `/${archive}output_subs.srt`, label: 'subtitles (mock)' },
+              ]
+            : []
+    const model =
+      step === '01' || step === '02'
+        ? 'claude-sonnet'
+        : step === '03' || step === '04'
+          ? 'comfyui'
+          : step === '05'
+            ? 'video:<unset>'
+            : step === '06'
+              ? 'elevenlabs'
+              : 'ffmpeg'
     return {
-      episode_id: episodeId, step, version: 'v1', is_latest: true, status: 'awaiting_review',
-      model: STEP_ORDER.indexOf(step) < 2 ? 'claude-sonnet' : '<待定模型>',
+      episode_id: episodeId,
+      step,
+      version: 'v1',
+      is_latest: true,
+      status: 'awaiting_review',
+      model,
       seed: Math.floor(Math.random() * 99999),
       params: {},
-      artifacts: [],
+      artifacts: arts,
       refs: [],
-      archive_path: `assets/${episodeId}/${step}/v1/`,
-      content: { note: `${step} 首版（占位产物，等真实后端接入）`, pending_schema: STEP_ORDER.indexOf(step) >= 2 },
-      created_at: now(), duration_ms: 0, failure: null,
+      archive_path: archive,
+      prompt_path: `${archive}prompt.md`,
+      meta_path: `${archive}meta.md`,
+      content: placeholderContent(episodeId, step),
+      created_at: now(),
+      duration_ms: 0,
+      failure: null,
     }
   }
 
