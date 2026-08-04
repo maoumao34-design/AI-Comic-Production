@@ -72,7 +72,8 @@ async function writeArchive(episodeId, stepId, version, { prompt, params, meta, 
   const latestDir = path.join(ASSETS_DIR, episodeId, STEP_DIR[stepId], "latest");
   await ensureDir(latestDir);
   await fs.writeFile(path.join(latestDir, "README.md"), `# latest\n\n→ ${version}\n\napproved at ${now()}\n`);
-  return { archive_path: `${episodeId}/${STEP_DIR[stepId]}/${version}/`, artifacts };
+  // archive_path 带 assets/ 前缀，对齐契约与 Pages/mock；artifacts?path= 仍用 ASSETS_DIR 相对路径（无前缀）
+  return { archive_path: `assets/${episodeId}/${STEP_DIR[stepId]}/${version}/`, artifacts };
 }
 
 async function readArtifact(relPath) {
@@ -313,16 +314,17 @@ export async function listArchiveTree(episodeId, stepId) {
   const stepDir = STEP_DIR[stepId];
   if (!stepDir) throw { status: 400, message: "unknown step" };
   const root = path.join(ASSETS_DIR, episodeId, stepDir);
-  const out = { episode_id: episodeId, step: stepId, root: `${episodeId}/${stepDir}/`, versions: [] };
+  const out = { episode_id: episodeId, step: stepId, root: `assets/${episodeId}/${stepDir}/`, versions: [] };
   let entries = [];
   try { entries = await fs.readdir(root, { withFileTypes: true }); } catch { return out; }
   for (const ent of entries.filter((e) => e.isDirectory()).sort((a, b) => a.name.localeCompare(b.name))) {
     if (ent.name === "latest") continue; // pointer dir, not a version archive
     const verPath = path.join(root, ent.name);
+    // files[].path / artifacts?path 保持 ASSETS_DIR 相对（无 assets/），供 readArtifact 拼接
     const files = await walkRelFiles(verPath, `${episodeId}/${stepDir}/${ent.name}`);
     out.versions.push({
       version: ent.name,
-      archive_path: `${episodeId}/${stepDir}/${ent.name}/`,
+      archive_path: `assets/${episodeId}/${stepDir}/${ent.name}/`,
       files: files.map((rel) => ({
         path: rel,
         url: `/api/v1/artifacts?path=${encodeURIComponent(rel)}`,
