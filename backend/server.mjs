@@ -36,9 +36,10 @@ const server = createServer(async (req, res) => {
 
   if (m === "OPTIONS") return send(res, 204, "");
   if (p === "/" || p === "/health") {
-    return json(res, 200, { service: "ai-comic-visualization-backend", version: "0.2.0-mvp",
+    return json(res, 200, { service: "ai-comic-visualization-backend", version: "0.3.0-mvp",
       contract: "docs/BACKEND-API-CONTRACT.md", base: "/api/v1", steps: api.META.STEPS.map((s) => s.id + "-" + s.name),
-      assets_dir: api.META.ASSETS_DIR });
+      assets_dir: api.META.ASSETS_DIR,
+      platform_map: "/api/v1/pipeline/platforms" });
   }
 
   // 路由前缀 /api/v1
@@ -95,7 +96,15 @@ const server = createServer(async (req, res) => {
     }
     // GET /health/platforms
     if (m === "GET" && r[0] === "health" && r[1] === "platforms" && !r[2]) {
-      return json(res, 200, api.health());
+      return json(res, 200, await api.health());
+    }
+    // GET /pipeline/platforms — 每步平台接入槽（FE / 接手 agent）
+    if (m === "GET" && r[0] === "pipeline" && r[1] === "platforms" && !r[2]) {
+      return json(res, 200, api.getPlatformMap());
+    }
+    // GET /episodes/:id/steps/:step/archive — 磁盘归档树（含 outputs/）
+    if (m === "GET" && r[0] === "episodes" && r[2] === "steps" && r[4] === "archive" && !r[5]) {
+      return json(res, 200, await api.listArchiveTree(r[1], r[3]));
     }
     // GET /queue
     if (m === "GET" && r[0] === "queue" && !r[1]) return json(res, 200, { queue: api.queueView() });
@@ -119,5 +128,6 @@ const server = createServer(async (req, res) => {
 server.listen(PORT, HOST, () => {
   console.log(`[backend] AI 漫剧可视化产品后端 (MVP) listening on http://${HOST}:${PORT}/api/v1`);
   console.log(`[backend] contract: docs/BACKEND-API-CONTRACT.md v0.2 | assets: ${api.META.ASSETS_DIR}`);
-  console.log(`[backend] 占位产物模式（不接真实平台）。health 如实报 unconfigured。`);
+  console.log(`[backend] 平台槽: GET /api/v1/pipeline/platforms ；健康: GET /api/v1/health/platforms`);
+  console.log(`[backend] 步骤产物默认占位；真实 Comfy 出图用 ep01-cli / comfy-run-workflow（CLI≠产品）。`);
 });

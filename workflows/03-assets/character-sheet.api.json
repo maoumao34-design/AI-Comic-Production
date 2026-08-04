@@ -1,0 +1,72 @@
+{
+  "_meta": {
+    "name": "03-assets-character-sheet-api",
+    "step": "03",
+    "purpose": "角色一致性资产（单张 character sheet / 三视图占位）。API format，可直接 POST /prompt。",
+    "notes": [
+      "ckpt_name / 采样参数可按本机 models/checkpoints 替换；默认占位名需改成你已下载的模型文件名。",
+      "CLIPTextEncode 带 meta.role=positive|negative，供 platforms/comfyui.mjs retry() 换 prompt。",
+      "竖屏漫剧：空 Latent 832x1216（约 2:3，接近 9:16）；可按导出规格再锁。"
+    ],
+    "model_placeholder": "REPLACE_WITH_YOUR_CHECKPOINT.safetensors"
+  },
+  "3": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "REPLACE_WITH_YOUR_CHECKPOINT.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "comic character reference sheet, front view side view back view, consistent face and outfit, clean white background, vertical composition, high detail",
+      "clip": ["3", 1]
+    },
+    "meta": { "role": "positive" }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "blurry, low quality, deformed hands, extra limbs, watermark, text, logo",
+      "clip": ["3", 1]
+    },
+    "meta": { "role": "negative" }
+  },
+  "6": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1216,
+      "batch_size": 1
+    }
+  },
+  "7": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "steps": 28,
+      "cfg": 7,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": ["3", 0],
+      "positive": ["4", 0],
+      "negative": ["5", 0],
+      "latent_image": ["6", 0]
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["7", 0],
+      "vae": ["3", 2]
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "EP01_03_char",
+      "images": ["8", 0]
+    }
+  }
+}

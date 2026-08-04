@@ -1,0 +1,29 @@
+{
+  "episode": "EP-01",
+  "step": "03-assets",
+  "version": "v1",
+  "created_at": "2026-08-04T05:45:00Z",
+  "author_agent": "漫剧制作总控",
+  "status": "draft_prompt_pack",
+  "source_storyboard": {
+    "episode": "EP-01",
+    "version": "v1",
+    "path": "assets/EP-01/02-storyboard/v1/"
+  },
+  "aspect_ratio_draft": "9:16",
+  "schema": "docs/STEP-CONTENT-SCHEMA-03-04-05.md#03",
+  "subjects_planned": {
+    "characters": ["char/serena", "char/james", "char/amy", "char/kate"],
+    "expressions": ["expr/serena-controlled", "expr/serena-steel", "expr/serena-alone"],
+    "costumes": ["costume/serena-villa-evening", "costume/amy-campus", "costume/kate-office"],
+    "scenes": ["scene/villa-living", "scene/campus", "scene/prime-group-skyline", "scene/kate-office", "scene/villa-window-driveway"],
+    "props": ["prop/scholarship-letter-100k", "prop/bentley-keys-docs", "prop/studio-share-papers", "prop/wineglass-white-knuckle", "prop/phone-split"]
+  },
+  "images_generated": false,
+  "platform": {
+    "required": "ComfyUI (glue from 平台集成工程师)",
+    "keys_status": "missing_cloud_or_use_local",
+    "local_runbook": "docs/EP01-LOCAL-GPU-RUN.md"
+  },
+  "decision": null
+}

@@ -1,0 +1,260 @@
+{
+  "step": "02-storyboard",
+  "episode": "EP-01",
+  "version": "v1",
+  "date": "2026-08-04",
+  "title": "The Confession",
+  "source_narration": {
+    "episode": "EP-01",
+    "version": "v1",
+    "step": "01-script",
+    "path": "assets/EP-01/01-script/v1/"
+  },
+  "aspect_ratio_draft": "9:16",
+  "shots_count": 16,
+  "est_total_duration_sec": 148,
+  "open_specs": ["duration", "resolution"],
+  "schema": "docs/CONTENT-SCHEMA-01-02.md#02",
+  "scenes": [
+    {
+      "scene_id": "sc1",
+      "label": "Villa living room · Confession",
+      "location": "Luxury villa living room (floor-to-ceiling glass)",
+      "linked_beats": ["b1", "b2", "b3"]
+    },
+    {
+      "scene_id": "sc2",
+      "label": "Flash inserts · Amy / scholarship / funding",
+      "location": "Campus / scholarship docs / studio (inserts)",
+      "linked_beats": ["b2", "b4"]
+    },
+    {
+      "scene_id": "sc3",
+      "label": "Serena alone · Identity monologue",
+      "location": "Villa interior; city / Prime Group montage",
+      "linked_beats": ["b4"]
+    },
+    {
+      "scene_id": "sc4",
+      "label": "Phone · Orders to Kate",
+      "location": "Villa desk + Kate office (split)",
+      "linked_beats": ["b5"]
+    },
+    {
+      "scene_id": "sc5",
+      "label": "Window · Kiss · Vow",
+      "location": "Villa glass wall overlooking driveway/garden",
+      "linked_beats": ["b6"]
+    }
+  ],
+  "shots": [
+    {
+      "shot_id": "s1",
+      "linked_beat_id": "b1",
+      "shot_no": "S1",
+      "characters": ["Serena Harris", "James Miller"],
+      "action": "James steps to Serena, takes her hand; she stays composed",
+      "scene": "Luxury villa living room",
+      "evidence_visual": "Their clasped hands in foreground; soft villa interior bokeh",
+      "shot_type": "中景",
+      "duration_sec": 6,
+      "ref_image_slot": "char/serena+james|scene/villa-living",
+      "notes": "Open; 9:16 bottom subtitle safe zone; calm before cut"
+    },
+    {
+      "shot_id": "s2",
+      "linked_beat_id": "b1",
+      "shot_no": "S2",
+      "characters": ["James Miller", "Serena Harris"],
+      "action": "James delivers the confession; Serena’s face stays controlled",
+      "scene": "Luxury villa living room",
+      "evidence_visual": "James mouth CU on dialogue; cut to Serena eyes reacting without screaming",
+      "shot_type": "近景",
+      "duration_sec": 8,
+      "ref_image_slot": "char/james|char/serena",
+      "notes": "Retain James line on-screen / VO sync: “Honey, I’ve fallen in love with another woman.”"
+    },
+    {
+      "shot_id": "s3",
+      "linked_beat_id": "b2",
+      "shot_no": "S3",
+      "characters": ["Serena Harris", "James Miller"],
+      "action": "Serena asks who; James answers; her jaw tightens",
+      "scene": "Luxury villa living room",
+      "evidence_visual": "Two-shot; Serena’s grip on wineglass / furniture edge white-knuckle",
+      "shot_type": "中景",
+      "duration_sec": 7,
+      "ref_image_slot": "char/serena+james|scene/villa-living",
+      "notes": "Humiliation rising; no scream"
+    },
+    {
+      "shot_id": "s4",
+      "linked_beat_id": "b2",
+      "shot_no": "S4",
+      "characters": ["Amy"],
+      "action": "Flash: Amy on campus, hardworking student look",
+      "scene": "Rivertown University campus (insert)",
+      "evidence_visual": "Campus path; Amy with backpack/books; soft daylight",
+      "shot_type": "全景",
+      "duration_sec": 5,
+      "ref_image_slot": "char/amy|scene/campus",
+      "notes": "Insert; name Amy visually"
+    },
+    {
+      "shot_id": "s5",
+      "linked_beat_id": "b2",
+      "shot_no": "S5",
+      "characters": ["Serena Harris", "Amy"],
+      "action": "Evidence flash of scholarship paperwork Serena funded",
+      "scene": "Desk / paperwork insert",
+      "evidence_visual": "Close-up: need-based scholarship award letter, $100,000 figure, Serena signature",
+      "shot_type": "特写",
+      "duration_sec": 5,
+      "ref_image_slot": "prop/scholarship-letter",
+      "notes": "Evidence beat: she built the scholarship"
+    },
+    {
+      "shot_id": "s6",
+      "linked_beat_id": "b2",
+      "shot_no": "S6",
+      "characters": ["James Miller", "Serena Harris"],
+      "action": "James gestures passionately comparing Amy to Serena; Serena listens cold",
+      "scene": "Luxury villa living room",
+      "evidence_visual": "James animated mid-shot; Serena still profile; optional street-food flash with Amy",
+      "shot_type": "中景",
+      "duration_sec": 10,
+      "ref_image_slot": "char/james|char/serena|char/amy",
+      "notes": "Contrast: money vs homemade care"
+    },
+    {
+      "shot_id": "s7",
+      "linked_beat_id": "b3",
+      "shot_no": "S7",
+      "characters": ["Serena Harris", "James Miller"],
+      "action": "Serena draws the divorce line; James agrees confidently",
+      "scene": "Luxury villa living room · standoff",
+      "evidence_visual": "Two-shot standoff; James nodding; Serena steel-eyed",
+      "shot_type": "中景",
+      "duration_sec": 9,
+      "ref_image_slot": "char/serena+james|scene/villa-living",
+      "notes": "Retain Serena: “If that’s what you want, then let’s get divorced.”"
+    },
+    {
+      "shot_id": "s8",
+      "linked_beat_id": "b3",
+      "shot_no": "S8",
+      "characters": ["Serena Harris"],
+      "action": "Serena delivers ice-cold game declaration",
+      "scene": "Luxury villa living room",
+      "evidence_visual": "Serena extreme close-up; eyes go steel; end on her face freeze",
+      "shot_type": "特写",
+      "duration_sec": 8,
+      "ref_image_slot": "char/serena",
+      "notes": "Retain Serena: “If you want love so badly, then go live without money. James Miller, the game begins now.”"
+    },
+    {
+      "shot_id": "s9",
+      "linked_beat_id": "b4",
+      "shot_no": "S9",
+      "characters": ["Serena Harris"],
+      "action": "Serena alone; VO identity open; bitter clarity",
+      "scene": "Villa interior · Serena alone",
+      "evidence_visual": "Serena standing alone in living room; soft ambient; title-card feel of her name",
+      "shot_type": "近景",
+      "duration_sec": 8,
+      "ref_image_slot": "char/serena|scene/villa-living",
+      "notes": "VO: Her name is Serena Harris…"
+    },
+    {
+      "shot_id": "s10",
+      "linked_beat_id": "b4",
+      "shot_no": "S10",
+      "characters": ["Serena Harris", "James Miller", "Amy"],
+      "action": "Montage of what she gave: sneakers overnight, studio funding, scholarship signing",
+      "scene": "Flash montage (delivery / studio / signing)",
+      "evidence_visual": "Sneaker box delivery CU; bank/funding transfer UI; scholarship signing with Amy present",
+      "shot_type": "特写",
+      "duration_sec": 12,
+      "ref_image_slot": "prop/sneakers|prop/funding|prop/scholarship-letter|char/amy",
+      "notes": "Fast cuts; evidence of sacrifice"
+    },
+    {
+      "shot_id": "s11",
+      "linked_beat_id": "b4",
+      "shot_no": "S11",
+      "characters": ["Serena Harris"],
+      "action": "Reveal: heiress / Prime Group / city holdings; smash back to betrayal",
+      "scene": "City skyline + Prime Group HQ insert → villa present",
+      "evidence_visual": "LA skyline night; Prime Group logo/building; half city commercial map glow; smash to Serena face",
+      "shot_type": "远景",
+      "duration_sec": 10,
+      "ref_image_slot": "scene/prime-group|scene/la-skyline|char/serena",
+      "notes": "Identity bomb; keep facts: daughter of LA’s wealthiest / Prime Group hundreds of billions"
+    },
+    {
+      "shot_id": "s12",
+      "linked_beat_id": "b5",
+      "shot_no": "S12",
+      "characters": ["Serena Harris", "Kate"],
+      "action": "Serena dials Kate; split: villa desk / Kate office",
+      "scene": "Villa desk + Kate office",
+      "evidence_visual": "Phone screen: Kate; Serena cold executive posture; Kate listening with notepad",
+      "shot_type": "中景",
+      "duration_sec": 7,
+      "ref_image_slot": "char/serena|char/kate|prop/phone",
+      "notes": "Three orders; no updates—only results"
+    },
+    {
+      "shot_id": "s13",
+      "linked_beat_id": "b5",
+      "shot_no": "S13",
+      "characters": ["Serena Harris", "James Miller"],
+      "action": "Order 1 cutaways: divorce draft, reclaim Bentley + studio shares",
+      "scene": "Evidence inserts (legal / car / studio)",
+      "evidence_visual": "Divorce papers stamp; Bentley keys/logo; studio share certificates stacked",
+      "shot_type": "特写",
+      "duration_sec": 9,
+      "ref_image_slot": "prop/divorce-papers|prop/bentley|prop/studio-shares",
+      "notes": "Lawyer delivers tomorrow morning"
+    },
+    {
+      "shot_id": "s14",
+      "linked_beat_id": "b5",
+      "shot_no": "S14",
+      "characters": ["Amy", "Serena Harris"],
+      "action": "Orders 2–3: investigate Amy, cut scholarship/card; blacklist Amy + cut James funding citywide",
+      "scene": "University crest + blacklist UI inserts",
+      "evidence_visual": "Rivertown University crest; cancelled scholarship stamp; red ‘never hire’ list with Amy; partner termination emails",
+      "shot_type": "特写",
+      "duration_sec": 10,
+      "ref_image_slot": "scene/campus|prop/scholarship-letter|prop/blacklist",
+      "notes": "Both unable to find a job in this city"
+    },
+    {
+      "shot_id": "s15",
+      "linked_beat_id": "b6",
+      "shot_no": "S15",
+      "characters": ["Serena Harris", "James Miller", "Amy"],
+      "action": "Serena at floor-to-ceiling window watches James kiss Amy downstairs",
+      "scene": "Villa glass wall overlooking driveway/garden",
+      "evidence_visual": "Serena reflection on glass; below: James+Amy kissing; villa lights warm vs her cold silhouette",
+      "shot_type": "全景",
+      "duration_sec": 12,
+      "ref_image_slot": "char/serena|char/james+amy|scene/villa-window",
+      "notes": "Emotional peak; designed villa / 6 months / 3 years obsession VO"
+    },
+    {
+      "shot_id": "s16",
+      "linked_beat_id": "b6",
+      "shot_no": "S16",
+      "characters": ["Serena Harris"],
+      "action": "Ownership reclaim evidence + final war vow close-up",
+      "scene": "Villa interiors as empty trophies → Serena CU",
+      "evidence_visual": "Prime Group deed on villa; company Bentley plate; studio investment docs; final Serena eyes CU",
+      "shot_type": "近景",
+      "duration_sec": 12,
+      "ref_image_slot": "prop/deed|prop/bentley|prop/studio-shares|char/serena",
+      "notes": "VO vow: crush everything… Amy loses the halo I gave her. End card energy."
+    }
+  ]
+}
