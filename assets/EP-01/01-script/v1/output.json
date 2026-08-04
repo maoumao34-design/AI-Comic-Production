@@ -1,0 +1,100 @@
+{
+  "step": "01-script",
+  "episode": "EP-01",
+  "title": "The Confession",
+  "version": "v1",
+  "date": "2026-08-04",
+  "narration_language": "en",
+  "one_line_premise": "James confesses he loves sponsored student Amy; Serena answers with divorce, asset reclamation, and the first crack of her hidden heiress identity.",
+  "emotion_arc": {
+    "opening": "controlled calm",
+    "rising": "humiliation / betrayal",
+    "turning": "identity reveal + cold resolve",
+    "closing": "declared war"
+  },
+  "est_duration_sec": 110,
+  "word_count": 528,
+  "word_count_target": {
+    "min": 180,
+    "max": 320,
+    "note": "English VO ~150 wpm; draft runs long (~3.5 min if read full). Trim on revise if target is 60–90s."
+  },
+  "beats_count": 6,
+  "retained_dialogues_count": 3,
+  "source": {
+    "primary": "english_docx",
+    "reference": "chinese_docx",
+    "primary_path": "references/scripts/english-script.docx",
+    "primary_title": "Episode 1",
+    "reference_path": "references/scripts/chinese-reference.docx",
+    "reference_title": "第1集"
+  },
+  "model": {
+    "name": "cursor-grok-4.5 (总控 draft)",
+    "temperature": null
+  },
+  "adaptation": {
+    "boundary_confirmed": false,
+    "policy": "Conservative: spoken glue only; plot unchanged; key dialogues kept verbatim; Chinese stage directions translated into visual_hint only.",
+    "changes": [
+      "Condensed Serena identity monologue into spoken VO without deleting facts (heiress / Prime Group / scholarship origin).",
+      "Kate phone orders kept as narration summary (not full multi-line dialogue dump) while preserving all three directives."
+    ]
+  },
+  "open_specs": ["duration", "resolution", "adaptation_boundary"],
+  "beats": [
+    {
+      "beat_id": "b1",
+      "scene_label": "Villa · Confession",
+      "narration_text": "In their villa, James takes Serena’s hand—and drops the bomb. He says he’s fallen in love with another woman.",
+      "preserved_dialogue": [
+        { "text": "Honey, I’ve fallen in love with another woman.", "character": "James Miller" }
+      ],
+      "emotion": "calm before the cut",
+      "visual_hint": "Luxury villa living room; James steps to Serena, takes her hand; Serena’s face still controlled"
+    },
+    {
+      "beat_id": "b2",
+      "scene_label": "Betrayal named · Amy",
+      "narration_text": "The answer cuts deeper than she expects. It’s Amy—the college student they sponsored together. The girl Serena built a hundred-thousand-dollar need-based scholarship for. James calls Amy hardworking, ambitious, sweet—and says she’s so much better than Serena. He complains Serena only threw money at him, while Amy cooked, shared street food, and made him feel like he had a home.",
+      "preserved_dialogue": [],
+      "emotion": "humiliation rising",
+      "visual_hint": "Insert/flash of Amy on campus; scholarship paperwork; James gesturing passionately; Serena listening, jaw tight"
+    },
+    {
+      "beat_id": "b3",
+      "scene_label": "Divorce line",
+      "narration_text": "Serena hears the whole excuse—and draws the line. If that’s what he wants, then let’s get divorced. James agrees. He says he doesn’t want a cent of her property. He’ll stay with Amy and build a life from the ground up. Serena’s reply is ice-cold: if you want love so badly, then go live without money. James Miller, the game begins now.",
+      "preserved_dialogue": [
+        { "text": "If that’s what you want, then let’s get divorced.", "character": "Serena Harris" },
+        { "text": "If you want love so badly, then go live without money. James Miller, the game begins now.", "character": "Serena Harris" }
+      ],
+      "emotion": "cold resolve",
+      "visual_hint": "Two-shot standoff; James confident; Serena’s eyes go steel; end on Serena close-up"
+    },
+    {
+      "beat_id": "b4",
+      "scene_label": "Identity monologue",
+      "narration_text": "Her name is Serena Harris. Married three years. She bought him limited sneakers overnight, secretly poured tens of millions into his business, and even created Amy’s scholarship because he asked. She gave him everything—except the truth. He thought she was a spoiled girl burning family savings on a barely floating company. He never knew she was the daughter of LA’s wealthiest family, that she controlled Prime Group, worth hundreds of billions, that half the commercial properties in this city were hers. She thought this carefully protected, ordinary happiness would last. Until today—when he chose the poor student she had personally sponsored and polished.",
+      "preserved_dialogue": [],
+      "emotion": "bitter clarity",
+      "visual_hint": "Serena alone; flash montage: sneakers delivery, studio funding, scholarship signing, city skyline / Prime Group; smash back to present betrayal"
+    },
+    {
+      "beat_id": "b5",
+      "scene_label": "Phone · Orders to Kate",
+      "narration_text": "Serena picks up the phone. Kate. Three orders, no updates—only results. Draft a divorce: James leaves with nothing; reclaim every property and vehicle under her name, including the Bentley he’s driving, and all shares in his studio—lawyer delivers tomorrow morning. Investigate Amy at Rivertown University; cut the scholarship and her supplementary card; demand a real poverty check. Notify every Prime Group branch and partner: Amy is never to be hired; terminate every partnership with James’s studio and cut all funding. She wants both of them unable to find a single job in this city.",
+      "preserved_dialogue": [],
+      "emotion": "executive coldness",
+      "visual_hint": "Serena at desk with phone; Kate on other end (office); cutaways: divorce papers, Bentley keys, university crest, blacklisted names"
+    },
+    {
+      "beat_id": "b6",
+      "scene_label": "Window · Kiss · Vow",
+      "narration_text": "She hangs up, stands at the floor-to-ceiling window—and watches James kiss Amy downstairs. She designed this villa herself. Six months of decorating. Three years of obsession. Starting today, none of it means a thing. James assumes she’ll leave him the villa, the car, the studio shares. How naive. The villa is under Prime Group. The Bentley is company property. The studio shares were her investment from the start. Time to take it all back. James, didn’t you want love? Then I’ll crush everything you lifted up with your own hands—and show you what your so-called ambition is worth once Amy loses the halo I gave her.",
+      "preserved_dialogue": [],
+      "emotion": "declared war",
+      "visual_hint": "Serena at glass wall looking down; James+Amy kissing at driveway/garden; Serena’s reflection; villa interiors as empty trophies; final Serena close-up"
+    }
+  ]
+}
