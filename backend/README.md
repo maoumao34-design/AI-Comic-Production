@@ -1,15 +1,23 @@
 # AI 漫剧可视化产品 · 后端（MVP 骨架）
 
 > owner：ComfyUI 平台集成工程师（后端）。对齐 [`docs/BACKEND-API-CONTRACT.md`](../docs/BACKEND-API-CONTRACT.md) v0.2。
-> **零依赖**（纯 Node ESM，Node ≥20）。MVP 阶段用**占位产物**、**不接真实平台**（health 如实报 unconfigured）。
+> **零依赖**（纯 Node ESM，Node ≥20）。步骤产物默认**占位**；ComfyUI 已接真实探活与本机出图脚本（见 [`docs/LOCAL-GPU-RUNBOOK.md`](../docs/LOCAL-GPU-RUNBOOK.md)）。
 
 ## 跑起来
 ```bash
 cd backend
 node server.mjs            # 默认 http://127.0.0.1:8000
 # 可选环境变量： PORT / HOST / ASSETS_DIR / FAIL_THRESHOLD
+# Comfy：COMFYUI_BASE_URL=http://127.0.0.1:8188（本地）或 Cloud URL + COMFYUI_API_KEY
 ```
 无 `npm install`，直接 `node server.mjs` 即起。
+
+本机 GPU 出图（步骤 03）：
+```bash
+set COMFYUI_BASE_URL=http://127.0.0.1:8188
+node scripts/comfy-health.mjs
+node scripts/comfy-run-workflow.mjs --workflow ../workflows/03-assets/character-sheet.api.json --episode EP-01 --step 03 --subject char-heiress
+```
 
 ## 它实现了什么（MVP 闭环）
 - **7 步状态机**（01剧本→02分镜→03资产→04关键帧→05分段视频→06配音字幕→07成片）
@@ -28,7 +36,7 @@ node server.mjs            # 默认 http://127.0.0.1:8000
 | `GET /episodes/{id}/steps/{step}/current` | 当前步 latest 版本（要 review 的） |
 | `GET /episodes/{id}/steps/{step}/versions` · `/{version}` | 版本浏览 |
 | `POST /episodes/{id}/steps/{step}/decision` `{action,note?,params_override?}` | ✅✏️🔄↩️（唯一推进入口） |
-| `GET /health/platforms` | 平台连接健康（MVP：unconfigured） |
+| `GET /health/platforms` | 平台连接健康（Comfy：按 env 真实探活；其它未配置则 unconfigured） |
 | `GET /queue` | 近期任务（可观测） |
 | `GET /artifacts?path=<集号>/<步骤>/<版本>/<文件>` | 取产物 |
 
@@ -53,10 +61,14 @@ curl -s $BASE/episodes/EP-01/steps/02/versions
 ## 目录
 ```
 backend/
-  server.mjs     HTTP 路由（零依赖 http）
-  engine.mjs     状态机 + 归档 + 占位生成 + decision 逻辑
-  data/assets/   运行时产物（gitignore，不提交）
+  server.mjs              HTTP 路由（零依赖 http）
+  engine.mjs              状态机 + 归档 + 占位生成 + decision 逻辑
+  platforms/comfyui.mjs   ComfyUI 五件套（submit/record/poll/recover/retry）+ health
+  scripts/comfy-*.mjs     本机健康检查 / 工作流出图归档
+  .env.example            COMFYUI_* 示例（勿提交真实 Key）
+  data/assets/            运行时产物（gitignore，不提交）
 ```
 
-## 接真实平台（后续，需 key）
-`engine.mjs` 的 `placeholderGen()` 替换为各平台胶水（ComfyUI / Seedance·Kling·Wan / ElevenLabs），key 走 `custom_env`，不进代码。`GET /health/platforms` 改为真实探活。
+## 接真实平台
+- **ComfyUI**：已实现 `platforms/comfyui.mjs`；本机用 `COMFYUI_BASE_URL=http://127.0.0.1:8188`，Cloud 另需 `COMFYUI_API_KEY`。详见 `docs/LOCAL-GPU-RUNBOOK.md`。
+- **视频模型 / ElevenLabs**：仍待 key；health 如实 unconfigured。key 走 env/`custom_env`，不进代码。

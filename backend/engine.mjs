@@ -1,9 +1,11 @@
 // engine.mjs — 可视化产品后端骨架（MVP）：7 步状态机 + 版本归档 + 占位产物
 // 零依赖（纯 Node ESM）。实现 BACKEND-API-CONTRACT v0.2 的核心闭环。
-// 真实平台（ComfyUI/视频模型/ElevenLabs）未接：health 如实报「未配置」，产物走占位桩。
+// ComfyUI：platforms/comfyui.mjs 已接真实探活（设 COMFYUI_BASE_URL）；步骤产物默认仍占位，本机出图用 scripts/comfy-run-workflow.mjs。
+// 视频模型 / ElevenLabs：未配置时如实 unconfigured，不伪造已连接。
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import * as comfyui from "./platforms/comfyui.mjs";
 
 // ---- 配置 ----
 const STEPS = [
@@ -259,14 +261,13 @@ export async function submitDecision(episodeId, stepId, decision) {
     current_version: r.steps[r.current_step]?.current_version };
 }
 
-export function health() {
-  // 铁律：不伪造「已连接平台」。MVP 阶段 key 未配置，如实报。
-  return {
-    comfyui: { status: "unconfigured", detail: "key/server 未配置（MVP 占位）" },
-    video_models: { status: "unconfigured", detail: "Seedance/Kling/Wan key 未配置" },
-    elevenlabs: { status: "unconfigured", detail: "ElevenLabs key 未配置" },
-    overall: "degraded",
-  };
+export async function health() {
+  // 铁律：不伪造「已连接平台」。Comfy 仅在 COMFYUI_BASE_URL 探活成功时报 ok。
+  const comfy = await comfyui.health();
+  const video_models = { status: "unconfigured", detail: "Seedance/Kling/Wan key 未配置" };
+  const elevenlabs = { status: "unconfigured", detail: "ElevenLabs key 未配置" };
+  const overall = comfy.status === "ok" ? "degraded" : "degraded"; // 其它平台未接 → overall 仍 degraded
+  return { comfyui: comfy, video_models, elevenlabs, overall };
 }
 export function queueView() { return queue.slice(0, 20); }
 export async function artifact(relPath) { return readArtifact(relPath); }

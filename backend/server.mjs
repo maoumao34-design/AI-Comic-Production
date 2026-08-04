@@ -95,7 +95,7 @@ const server = createServer(async (req, res) => {
     }
     // GET /health/platforms
     if (m === "GET" && r[0] === "health" && r[1] === "platforms" && !r[2]) {
-      return json(res, 200, api.health());
+      return json(res, 200, await api.health());
     }
     // GET /queue
     if (m === "GET" && r[0] === "queue" && !r[1]) return json(res, 200, { queue: api.queueView() });
@@ -119,5 +119,5 @@ const server = createServer(async (req, res) => {
 server.listen(PORT, HOST, () => {
   console.log(`[backend] AI 漫剧可视化产品后端 (MVP) listening on http://${HOST}:${PORT}/api/v1`);
   console.log(`[backend] contract: docs/BACKEND-API-CONTRACT.md v0.2 | assets: ${api.META.ASSETS_DIR}`);
-  console.log(`[backend] 占位产物模式（不接真实平台）。health 如实报 unconfigured。`);
+  console.log(`[backend] 步骤产物默认占位；Comfy 探活看 COMFYUI_BASE_URL（见 docs/LOCAL-GPU-RUNBOOK.md）。`);
 });
