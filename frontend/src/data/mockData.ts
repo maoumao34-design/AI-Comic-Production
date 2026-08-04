@@ -84,12 +84,96 @@ export const SEED_VERSIONS: Record<StepId, StepVersion[]> = {
   '07': [],
 }
 
+function placeholder03(episodeId: string): unknown {
+  return {
+    step: '03-assets', episode: episodeId, version: 'v1',
+    platform_slot: { primary: 'comfyui', candidates: ['comfyui'], note: '03 默认 ComfyUI；真实图由 Job/CLI 写入 outputs，不伪造' },
+    subjects: [
+      {
+        subject_type: 'character', subject_id: 'serena', label: 'Serena', status: 'draft',
+        views: {
+          front: `/mock/assets/${episodeId}/03-assets/v1/outputs/serena/front.png`,
+          side: `/mock/assets/${episodeId}/03-assets/v1/outputs/serena/side.png`,
+          back: `/mock/assets/${episodeId}/03-assets/v1/outputs/serena/back.png`,
+        },
+        consistency_ref: null,
+        consistency_check: { passed: true, issues: [] },
+        prompt: 'Serena, elegant dinner look, three-view character sheet, consistent face',
+      },
+      {
+        subject_type: 'scene', subject_id: 'banquet_hall', label: '高档晚宴厅', status: 'draft',
+        output: { url: `/mock/assets/${episodeId}/03-assets/v1/outputs/banquet_hall/hero.png`, type: 'image' },
+        consistency_check: { passed: true, issues: [] },
+      },
+      {
+        subject_type: 'prop', subject_id: 'invitation', label: '豪门请柬', status: 'draft',
+        output: { url: `/mock/assets/${episodeId}/03-assets/v1/outputs/invitation/closeup.png`, type: 'image' },
+        consistency_check: { passed: true, issues: [] },
+      },
+    ],
+  }
+}
+
+function placeholder04(episodeId: string): unknown {
+  return {
+    step: '04-keyframes', episode: episodeId, version: 'v1',
+    platform_slot: { primary: 'comfyui', candidates: ['comfyui'], note: '04 引用 03 locked 资产' },
+    keyframes: [
+      { kf_id: 'kf1', source_shot_id: 's1', shot: { 景别: '中景', angle: 'eye-level', composition: 'Serena 端杯' }, asset_refs: ['serena', 'banquet_hall'], characters_in_frame: ['Serena', 'James'], output: { url: `/mock/assets/${episodeId}/04-keyframes/v1/outputs/kf1.png`, type: 'image' }, prompt: 'Serena holding wine glass at banquet' },
+      { kf_id: 'kf2', source_shot_id: 's2', shot: { 景别: '近景', angle: 'high', composition: '请柬滑落' }, asset_refs: ['invitation', 'serena'], characters_in_frame: ['Serena'], output: { url: `/mock/assets/${episodeId}/04-keyframes/v1/outputs/kf2.png`, type: 'image' }, prompt: 'invitation card sliding onto table' },
+      { kf_id: 'kf3', source_shot_id: 's4', shot: { 景别: '全景', angle: 'eye-level', composition: '离场背影' }, asset_refs: ['serena', 'banquet_hall'], characters_in_frame: ['Serena'], output: { url: `/mock/assets/${episodeId}/04-keyframes/v1/outputs/kf3.png`, type: 'image' }, prompt: 'Serena exiting banquet hall silhouette' },
+    ],
+  }
+}
+
+function placeholder05(episodeId: string): unknown {
+  return {
+    step: '05-segments', episode: episodeId, version: 'v1',
+    platform_slot: {
+      primary: '(未定)', candidates: ['seedance', 'kling', 'wan', 'comfyui'], locked: false,
+      note: '05 视频平台多选：先讨论再定；拿不准找导演确认',
+    },
+    segments: [
+      {
+        seg_id: 'seg1', duration_s: 6,
+        keyframe_refs: { first: 'kf1', last: 'kf2' },
+        prompt: { shot: '中景→近景', action: 'Serena 端杯，请柬滑落', dialogue: '', emotion: '平静中藏锋', sfx: 'glass clink, murmur' },
+        selection: { decision: 'pending', reason: '' },
+        output: { url: `/mock/assets/${episodeId}/05-segments/v1/outputs/seg1.mp4`, type: 'video' },
+      },
+      {
+        seg_id: 'seg2', duration_s: 7,
+        keyframe_refs: { first: 'kf2', last: 'kf3' },
+        prompt: { shot: '近景→全景', action: '一饮而尽离场', dialogue: 'Enjoy your evening.', emotion: '隐忍', sfx: 'footsteps, door' },
+        selection: { decision: 'pending', reason: '' },
+        output: { url: `/mock/assets/${episodeId}/05-segments/v1/outputs/seg2.mp4`, type: 'video' },
+      },
+    ],
+  }
+}
+
 /** 给"重生/修改"产生的新版本占位内容 */
-export function draftVersionContent(step: StepId): unknown {
+export function draftVersionContent(step: StepId, episodeId = 'EP-01'): unknown {
   switch (step) {
     case '01':
       return { ...(SEED_VERSIONS['01'][0].content as object), beats_count: 3, one_line_premise: '（重生草稿）Serena 身份暴露起点 · 换参重跑版本' }
+    case '03':
+      return { ...placeholder03(episodeId) as object, note: '03 重生草稿（mock 可审，非真实出图）' }
+    case '04':
+      return { ...placeholder04(episodeId) as object, note: '04 重生草稿（mock 可审）' }
+    case '05':
+      return { ...placeholder05(episodeId) as object, note: '05 重生草稿（平台未锁）' }
     default:
       return { note: `${step} 重生草稿（占位产物）`, pending_schema: true }
+  }
+}
+
+/** approve 推进时下一步首版 content（03/04/05 用可审 mock，不伪造「已通过 GPU」） */
+export function nextStepPlaceholderContent(step: StepId, episodeId: string): unknown {
+  switch (step) {
+    case '03': return placeholder03(episodeId)
+    case '04': return placeholder04(episodeId)
+    case '05': return placeholder05(episodeId)
+    default: return { note: `${step} 首版（占位产物，等真实后端接入）`, pending_schema: true }
   }
 }

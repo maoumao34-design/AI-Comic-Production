@@ -8,7 +8,7 @@ import type {
   DecisionAction,
 } from '../types'
 import { STEP_ORDER } from '../types'
-import { SEED_EPISODES, SEED_VERSIONS, draftVersionContent } from '../data/mockData'
+import { SEED_EPISODES, SEED_VERSIONS, draftVersionContent, nextStepPlaceholderContent } from '../data/mockData'
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 const now = () => new Date().toISOString()
@@ -155,7 +155,7 @@ class MockApi implements ComicApi {
         status: 'awaiting_review',
         seed: d.action === 'regenerate' && d.params_override?.seed != null ? Number(d.params_override.seed) : (cur.seed ?? 0) + 7,
         params: { ...(cur.params ?? {}), ...(d.params_override ?? {}) },
-        content: draftVersionContent(step),
+        content: draftVersionContent(step, episodeId),
         created_at: now(),
         artifacts: cur.artifacts.map((a) => ({ ...a, label: a.label + ' (重生)' })),
         failure: null,
@@ -167,15 +167,32 @@ class MockApi implements ComicApi {
   }
 
   private placeholder(episodeId: string, step: StepId): StepVersion {
+    const archName =
+      step === '03' ? '03-assets' : step === '04' ? '04-keyframes' : step === '05' ? '05-segments' : step
+    const content = nextStepPlaceholderContent(step, episodeId)
+    const art = (label: string, path: string, type: 'image' | 'video' = 'image') => ({
+      type, url: `/mock${path}`, label,
+    })
+    const artifacts =
+      step === '03'
+        ? [
+            art('Serena 三视图', `/assets/${episodeId}/03-assets/v1/outputs/serena/front.png`),
+            art('晚宴厅', `/assets/${episodeId}/03-assets/v1/outputs/banquet_hall/hero.png`),
+          ]
+        : step === '04'
+          ? [art('关键帧 kf1', `/assets/${episodeId}/04-keyframes/v1/outputs/kf1.png`)]
+          : step === '05'
+            ? [art('分段 seg1', `/assets/${episodeId}/05-segments/v1/outputs/seg1.mp4`, 'video')]
+            : []
     return {
       episode_id: episodeId, step, version: 'v1', is_latest: true, status: 'awaiting_review',
-      model: STEP_ORDER.indexOf(step) < 2 ? 'claude-sonnet' : '<待定模型>',
+      model: STEP_ORDER.indexOf(step) < 2 ? 'claude-sonnet' : step === '05' ? '(平台未定)' : 'comfyui-local',
       seed: Math.floor(Math.random() * 99999),
-      params: {},
-      artifacts: [],
-      refs: [],
-      archive_path: `assets/${episodeId}/${step}/v1/`,
-      content: { note: `${step} 首版（占位产物，等真实后端接入）`, pending_schema: STEP_ORDER.indexOf(step) >= 2 },
+      params: step === '05' ? { platform_locked: false } : { platform: 'comfyui' },
+      artifacts,
+      refs: step === '04' ? [`assets/${episodeId}/03-assets/latest/`] : step === '05' ? [`assets/${episodeId}/04-keyframes/latest/`] : [],
+      archive_path: `assets/${episodeId}/${archName}/v1/`,
+      content,
       created_at: now(), duration_ms: 0, failure: null,
     }
   }
