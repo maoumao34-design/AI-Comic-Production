@@ -28,9 +28,9 @@
 
 ### 完整剧本与形式样片
 
-- 《The Heiress Blacklisted Her Husband》英文版 30 集剧本。
-- 便于理解剧情的中文版 30 集参考文档。
-- 1 支竖屏 AI 解说剧样片，用于参考旁白、字幕、画面和剪辑形式。
+- 《The Heiress Blacklisted Her Husband》英文版 30 集剧本 → [`references/scripts/english-script.docx`](./references/scripts/english-script.docx)。
+- 便于理解剧情的中文版 30 集参考文档 → [`references/scripts/chinese-reference.docx`](./references/scripts/chinese-reference.docx)（**仅供参考；实际制作须全英文**）。
+- 1 支竖屏 AI 解说剧样片，用于参考旁白、字幕、画面和剪辑形式（**尚未入库**）。
 
 ### 当前测试材料
 
