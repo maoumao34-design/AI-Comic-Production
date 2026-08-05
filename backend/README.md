@@ -23,6 +23,7 @@ node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --ckpt 你�
 ## 它实现了什么（MVP 闭环）
 - **7 步状态机**（01剧本→02分镜→03资产→04关键帧→05分段视频→06配音字幕→07成片）
 - **4 个 decision**（总控定稿）：`approve`✅推进 / `revise`✏️带意见重跑当前步 / `regenerate`🔄换参重跑当前步 / `rollback`↩️回上一步（仅 approve 推进；rollback 在 approved/failed/done 仍可打回）
+- **选用旧版** `select-version`：同一步内改审阅指针；不退步、不删档、不改 `is_latest`/`latest/`（见 `docs/SELECT-VERSION-CONTRACT.md`）
 - **版本归档**：默认 `assets/<集号>/<步骤>/<版本>/{prompt.md,params.json,refs/,output.*,meta.md}` + `latest` 指针（可用 `ASSETS_DIR` 覆盖）
 - **每步平台槽**：`GET /pipeline/platforms`（03/04→ComfyUI；05 多候选 needs_decision；06→ElevenLabs；07→local_compose）
 - **失败/重试**：超 `FAIL_THRESHOLD`(默认3) → `paused`（escalation，不无限重跑）
@@ -39,6 +40,7 @@ node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --ckpt 你�
 | `GET /episodes/{id}/steps/{step}/versions` · `/{version}` | 版本浏览 |
 | `GET /episodes/{id}/steps/{step}/archive` | 磁盘归档树（含 outputs/，接手 agent 可见） |
 | `POST /episodes/{id}/steps/{step}/decision` `{action,note?,params_override?}` | ✅✏️🔄↩️（唯一推进入口） |
+| `POST /episodes/{id}/steps/{step}/select-version` `{version,note?}` | 选用旧版（只改 `current_version`；门禁=当前步+awaiting_review；≠↩️） |
 | `GET /pipeline/platforms` | 每步平台接入槽 + 多候选策略 |
 | `GET /health/platforms` | 平台连接健康（Comfy/视频/ElevenLabs/合成；未配置如实 unconfigured） |
 | `GET /queue` | 近期任务（可观测） |
