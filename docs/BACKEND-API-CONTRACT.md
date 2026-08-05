@@ -122,15 +122,22 @@ assets/<集号>/<步骤>-<名称>/latest    → 指向当前通过版本（软�
 ### 4.3 步骤与版本（checkpoint 展示）
 | 方法 路径 | 说明 |
 |---|---|
-| `GET /episodes/{episode_id}/steps/{step}/current` | 当前步的 latest 版本（= 要你 review 的那版） |
-| `GET /episodes/{episode_id}/steps/{step}/versions` | 该步所有版本（版本浏览器） |
+| `GET /episodes/{episode_id}/steps/{step}/current` | 当前步的**审阅版**（`current_version`，= DecisionBar 作用对象；选用旧版后即该历史 vN） |
+| `GET /episodes/{episode_id}/steps/{step}/versions` | 该步所有版本（版本浏览器；含 `is_latest` 通过标） |
 | `GET /episodes/{episode_id}/steps/{step}/versions/{version}` | 某版本详情（含 artifacts/params/content） |
 | `GET /artifacts?path=...` | 取产物文件（图/视频/音频）——鉴权后直读归档 |
 
-### 4.4 决策（✅/✏️/↩️/🔄）= 推进流水线的唯一入口
+### 4.4 决策（✅/✏️/↩️/🔄）= 推进流水线的主入口
 | 方法 路径 | 说明 |
 |---|---|
 | `POST /episodes/{episode_id}/steps/{step}/decision` | 提交 Decision（§2.3，语义已锁定）。后端据 `action`：approve→归档为 latest 并进下一步；revise→带 note 重跑当前步出新版；regenerate→换参/seed 重跑当前步；rollback→回上一步重做（当前版本保留归档）。返回新的 run/step 状态。**失败/重生超阈值（PIPELINE-DESIGN §5，默认 3 次）→ 暂停并 escalation（不无限重跑）。** |
+
+### 4.4b 选用旧版（同一步审阅指针 · 总控增量 2026-08-05）
+| 方法 路径 | 说明 |
+|---|---|
+| `POST /episodes/{episode_id}/steps/{step}/select-version` | 把该步某历史 `version` 设为 `current_version`（审阅指针）。**不**改 `is_latest`/`latest/`；**不**删任何 `vN`；**不**改 `current_step`。门禁：当前步 + `awaiting_review`。权威细则：[SELECT-VERSION-CONTRACT.md](./SELECT-VERSION-CONTRACT.md)。响应形同 §4.6 decision 瘦身 `{ result: { run_id, status, current_step, current_version } }`。 |
+
+> 澄清：`GET .../current` = 审阅指针（`current_version`）；`is_latest` = 通过指针（仅 approve 置位）。二者可以不是同一版。Decision 作用于 `current`，不是「必然作用于 is_latest」。
 
 ### 4.5 健康 / 可观测（对齐能力强化重点「可观测」）
 | 方法 路径 | 说明 |
@@ -155,7 +162,7 @@ assets/<集号>/<步骤>-<名称>/latest    → 指向当前通过版本（软�
   - `GET /queue` → `{ queue: Job[] }`
 - **step id = 短形式 `01`..`07`**（与 §2.2 示例 `"step":"04"` 一致；归档目录仍用全名 `04-keyframes`，由后端映射，前端不感知）。
 - **`Run.steps` 是对象（按 step id 键），不是数组**：`{ "01": { status, versions:[], current_version, fail_count }, ... }`。
-- **`is_latest`** 只在 `approve` 后标 `true`（§3 latest 指针语义）；当前待 review 的版本走 `GET .../current`（status=`awaiting_review`）。
+- **`is_latest`** 只在 `approve` 后标 `true`（§3 latest 指针语义）；当前待 review 的版本走 `GET .../current`（= `current_version`，status=`awaiting_review`）。**选用旧版**只改 `current_version`，不改 `is_latest`（见 §4.4b / SELECT-VERSION-CONTRACT）。
 - **PlatformHealth（嵌套）**：`{ comfyui:{status,detail}, video_models:{status,detail}, elevenlabs:{status,detail}, overall }`，每项 `status` ∈ `unconfigured|ok|degraded|down`（MVP：`unconfigured`，不伪造）。
 - 写操作幂等：前端可带 `client_request_id`（后端目前透传、不强制）。
 
