@@ -117,7 +117,12 @@ class MockApi implements ComicApi {
     const vs = this.versions[step]
     const cur = vs.find((v) => v.episode_id === episodeId && v.is_latest)
     if (!cur) throw new Error(`${episodeId}/${step} 无可决策版本`)
-    if (cur.status !== 'awaiting_review') throw new Error(`当前状态 ${cur.status}，不可决策（仅 awaiting_review 可点）`)
+    const rollbackOk = cur.status === 'awaiting_review' || cur.status === 'approved' || cur.status === 'failed'
+    if (d.action === 'rollback') {
+      if (!rollbackOk) throw new Error(`当前状态 ${cur.status}，不可回退`)
+    } else if (cur.status !== 'awaiting_review') {
+      throw new Error(`当前状态 ${cur.status}，不可决策（✅✏️🔄 仅 awaiting_review；↩️ 在 approved/failed 仍可）`)
+    }
 
     const bump = (n: number): string => {
       const m = cur.version.match(/^v(\d+)$/)
@@ -140,6 +145,7 @@ class MockApi implements ComicApi {
       if (!ps) throw new Error('已在第一步，无法回退')
       cur.status = 'superseded'
       ep.current_step = ps
+      if (ep.status === 'done') ep.status = 'in_progress'
       // 上步重新进入 awaiting_review
       const pvs = this.versions[ps].filter((v) => v.episode_id === episodeId)
       const pl = pvs.find((v) => v.is_latest)
