@@ -94,6 +94,13 @@ const server = createServer(async (req, res) => {
       const result = await api.submitDecision(r[1], r[3], b);
       return json(res, 200, { result });
     }
+    // POST /episodes/:id/steps/:step/select-version — 选用旧版（审阅指针；≠ rollback）
+    if (m === "POST" && r[0] === "episodes" && r[2] === "steps" && r[4] === "select-version" && !r[5]) {
+      const b = await readJsonBody(req);
+      if (!b.version) return fail(res, 400, "missing version", "body.version required (e.g. v2)");
+      const result = await api.selectVersion(r[1], r[3], b);
+      return json(res, 200, { result });
+    }
     // GET /health/platforms
     if (m === "GET" && r[0] === "health" && r[1] === "platforms" && !r[2]) {
       return json(res, 200, await api.health());

@@ -239,6 +239,85 @@ function versionView(svObj, version) {
 const ROLLBACKABLE = new Set(["awaiting_review", "approved", "failed"]);
 
 /**
+ * 选用旧版（SELECT-VERSION-CONTRACT §3）：同一步内改审阅指针 current_version。
+ * 不退步、不删/覆盖任何 vN、不改 is_latest / latest/。
+ * 门禁 ≠ 任意态↩️：仅当前步 + awaiting_review（running/错步 → 409；缺版 → 404）。
+ */
+export async function selectVersion(episodeId, stepId, body = {}) {
+  const ep = episodes.get(episodeId); if (!ep) throw { status: 404, message: "episode not found" };
+  const r = activeRun(episodeId); if (!r) throw { status: 404, message: "no active run" };
+  const svObj = r.steps[stepId]; if (!svObj) throw { status: 404, message: "step not found" };
+
+  const targetVer = body.version;
+  if (!targetVer || typeof targetVer !== "string") {
+    throw { status: 400, message: "missing version", detail: "body.version required (e.g. v2)" };
+  }
+  if (targetVer === "latest") {
+    throw { status: 404, message: "version not found", detail: "latest is a pointer dir, not a selectable version" };
+  }
+
+  // 只能改当前步审阅指针
+  if (r.current_step !== stepId) {
+    throw { status: 409, message: `not current step (now ${r.current_step})` };
+  }
+
+  const cur = svObj.versions.find((x) => x.version === svObj.current_version);
+  const verStatus = cur?.status || svObj.status;
+  if (svObj.status === "running" || verStatus === "running") {
+    throw { status: 409, message: `step is running` };
+  }
+  if (svObj.status !== "awaiting_review" && verStatus !== "awaiting_review") {
+    throw { status: 409, message: `step not awaiting_review (now ${verStatus})` };
+  }
+
+  const target = svObj.versions.find((x) => x.version === targetVer);
+  if (!target) throw { status: 404, message: "version not found", detail: targetVer };
+
+  const fromVer = svObj.current_version;
+  // 同版幂等：不改状态、跳过 audit
+  if (fromVer === targetVer) {
+    return { run_id: r.run_id, status: r.status, current_step: r.current_step, current_version: fromVer };
+  }
+
+  // 旧审阅版 → superseded（归档保留）；目标版 → awaiting_review
+  if (cur && cur.status === "awaiting_review" && cur !== target) {
+    cur.status = "superseded";
+  }
+  target.status = "awaiting_review";
+  svObj.current_version = targetVer;
+  svObj.status = "awaiting_review";
+  // 不改任何版 is_latest；不写 latest/；不改 current_step
+
+  const at = now();
+  const operator = body.operator || "maozh2";
+  const rec = {
+    action: "select_version",
+    note: body.note || null,
+    from: fromVer,
+    to: targetVer,
+    operator,
+    at,
+    client_request_id: body.client_request_id || null,
+  };
+  target.decision_history.push(rec);
+
+  // meta.md 追加一行（磁盘归档存在时）
+  if (target.archive_path) {
+    const metaAbs = path.join(ASSETS_DIR, episodeId, STEP_DIR[stepId], targetVer, "meta.md");
+    const line = `select_version from=${fromVer} to=${targetVer} by=${operator} at=${at}` +
+      (body.note ? ` note=${JSON.stringify(body.note)}` : "") + "\n";
+    try {
+      await fs.appendFile(metaAbs, line);
+    } catch {
+      // 缺档不阻断指针切换（内存态已生效）
+    }
+  }
+
+  ep.updated_at = at;
+  return { run_id: r.run_id, status: r.status, current_step: r.current_step, current_version: targetVer };
+}
+
+/**
  * 提交 decision（唯一推进流水线的入口）。语义=总控定稿（见 BACKEND-API-CONTRACT §2.3）。
  * approve→推进下一步；revise→带 note 重跑当前步；regenerate→换参重跑当前步；rollback→回上一步。
  * rollback 例外：approved/failed/done 仍可打回（maozh2 2026-08-05）；✅✏️🔄 仍仅 awaiting_review。
