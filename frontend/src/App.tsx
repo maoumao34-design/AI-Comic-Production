@@ -124,6 +124,25 @@ export default function App() {
     }
   }
 
+  const onSelectVersion = async (v: StepVersion) => {
+    if (!curVersion) return
+    setBusy(true)
+    const ep = curVersion.episode_id
+    const step = focusStep ?? curVersion.step
+    pushLog('user', `选用此版 · ${STEP_LABELS[step]} ${v.version}`)
+    try {
+      const r = await api.selectVersion(ep, step, v.version)
+      setRun(r)
+      await loadStep(ep, step)
+      pushLog('system', `审阅指针 → ${v.version}（current_step 仍 ${STEP_LABELS[r.current_step]}；归档保留）`)
+    } catch (e) {
+      setErr(String(e))
+      pushLog('system', `选用失败：${String(e)}`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="app">
       <header className="topbar">
@@ -154,7 +173,7 @@ export default function App() {
         </section>
         <section className="right">
           {curVersion ? (
-            <StepView current={curVersion} versions={versions} busy={busy} health={health} onDecision={onDecision} />
+            <StepView current={curVersion} versions={versions} busy={busy} health={health} onDecision={onDecision} onSelectVersion={onSelectVersion} />
           ) : (
             <div className="empty big">在左侧选择/新建一集并发起 run，工作区会展示当前 checkpoint。</div>
           )}

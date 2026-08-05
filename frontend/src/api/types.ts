@@ -23,6 +23,8 @@ export interface ComicApi {
   listVersions(episodeId: string, step: StepId): Promise<StepVersion[]>
   // §4.4 Decision（推进流水线的唯一入口）
   postDecision(episodeId: string, step: StepId, d: Omit<Decision, 'episode_id' | 'step' | 'at'>): Promise<RunInfo>
+  // §4.4b 选用旧版（审阅指针；见 SELECT-VERSION-CONTRACT）
+  selectVersion(episodeId: string, step: StepId, version: string, note?: string): Promise<RunInfo>
   // §4.5 Health
   getPlatformHealth(): Promise<PlatformHealth>
 }

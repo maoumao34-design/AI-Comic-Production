@@ -20,15 +20,53 @@ const prevStep = (s: StepId): StepId | null => {
   const i = STEP_ORDER.indexOf(s)
   return i > 0 ? STEP_ORDER[i - 1] : null
 }
+const ptrKey = (ep: string, step: StepId) => `${ep}/${step}`
 
 /**
- * 内存态 mock 后端，实现 BACKEND-API-CONTRACT §4 的接口 + §2.3 的 decision 语义。
- * 后端就绪后切换到 RealApi（见 ./index.ts），前端代码无需改。
+ * 内存态 mock 后端，实现 BACKEND-API-CONTRACT §4 + SELECT-VERSION-CONTRACT。
+ * 审阅指针 current_version 与通过指针 is_latest 分开维护。
  */
 class MockApi implements ComicApi {
   private episodes: Episode[] = structuredClone(SEED_EPISODES)
   private versions: Record<StepId, StepVersion[]> = structuredClone(SEED_VERSIONS)
   private runs: Map<string, RunInfo> = new Map()
+  /** 审阅指针：episode/step → version id（≠ is_latest） */
+  private currentPtr: Record<string, string> = {}
+
+  constructor() {
+    for (const step of STEP_ORDER) {
+      for (const v of this.versions[step]) {
+        const k = ptrKey(v.episode_id, step)
+        if (!this.currentPtr[k]) {
+          // 优先 awaiting_review，否则 is_latest，否则该步最后一版
+          const vs = this.versions[step].filter((x) => x.episode_id === v.episode_id)
+          const review = vs.find((x) => x.status === 'awaiting_review')
+          const latest = vs.find((x) => x.is_latest)
+          this.currentPtr[k] = (review ?? latest ?? vs[vs.length - 1]).version
+        }
+      }
+    }
+  }
+
+  private epi(id: string): Episode {
+    const e = this.episodes.find((x) => x.episode_id === id)
+    if (!e) throw new Error(`episode ${id} not found`)
+    return e
+  }
+
+  private stepVersions(episodeId: string, step: StepId): StepVersion[] {
+    return this.versions[step].filter((v) => v.episode_id === episodeId)
+  }
+
+  private getCurrent(episodeId: string, step: StepId): StepVersion | undefined {
+    const vs = this.stepVersions(episodeId, step)
+    const ptr = this.currentPtr[ptrKey(episodeId, step)]
+    return (ptr ? vs.find((v) => v.version === ptr) : undefined) ?? vs.find((v) => v.is_latest) ?? vs[vs.length - 1]
+  }
+
+  private setCurrent(episodeId: string, step: StepId, version: string) {
+    this.currentPtr[ptrKey(episodeId, step)] = version
+  }
 
   private runFor(episodeId: string): RunInfo {
     const ep = this.epi(episodeId)
@@ -41,19 +79,12 @@ class MockApi implements ComicApi {
       current_step: ep.current_step,
       started_at: now(),
       steps: STEP_ORDER.map((step) => {
-        const vs = this.versions[step].filter((v) => v.episode_id === episodeId)
-        const latest = vs.find((v) => v.is_latest)
-        return { step, status: latest?.status ?? 'pending', latest_version: latest?.version }
+        const cur = this.getCurrent(episodeId, step)
+        return { step, status: cur?.status ?? 'pending', latest_version: cur?.version }
       }),
     }
     this.runs.set(run.run_id, run)
     return run
-  }
-
-  private epi(id: string): Episode {
-    const e = this.episodes.find((x) => x.episode_id === id)
-    if (!e) throw new Error(`episode ${id} not found`)
-    return e
   }
 
   private syncRun(episodeId: string): RunInfo {
@@ -61,11 +92,20 @@ class MockApi implements ComicApi {
     const run = this.runFor(episodeId)
     run.current_step = ep.current_step
     run.steps = STEP_ORDER.map((step) => {
-      const vs = this.versions[step].filter((v) => v.episode_id === episodeId)
-      const latest = vs.find((v) => v.is_latest)
-      return { step, status: latest?.status ?? (STEP_ORDER.indexOf(step) < STEP_ORDER.indexOf(ep.current_step) ? 'approved' : 'pending'), latest_version: latest?.version }
+      const cur = this.getCurrent(episodeId, step)
+      const fallback =
+        STEP_ORDER.indexOf(step) < STEP_ORDER.indexOf(ep.current_step) ? 'approved' : 'pending'
+      return {
+        step,
+        status: cur?.status ?? fallback,
+        latest_version: cur?.version,
+      }
     })
-    run.status = ep.current_step === '07' && this.versions['07'].some((v) => (v as StepVersion).episode_id === episodeId && (v as StepVersion).status === 'approved') ? 'done' : 'paused_at_checkpoint'
+    run.status =
+      ep.current_step === '07' &&
+      this.versions['07'].some((v) => v.episode_id === episodeId && v.status === 'approved')
+        ? 'done'
+        : 'paused_at_checkpoint'
     return run
   }
 
@@ -100,22 +140,49 @@ class MockApi implements ComicApi {
   }
   async getCurrentVersion(episodeId: string, step: StepId): Promise<StepVersion> {
     await delay(100)
-    const vs = this.versions[step].filter((v) => v.episode_id === episodeId)
-    const latest = vs.find((v) => v.is_latest) ?? vs[vs.length - 1]
-    if (!latest) throw new Error(`${episodeId}/${step} 暂无版本`)
-    return structuredClone(latest)
+    const cur = this.getCurrent(episodeId, step)
+    if (!cur) throw new Error(`${episodeId}/${step} 暂无版本`)
+    return structuredClone(cur)
   }
   async listVersions(episodeId: string, step: StepId): Promise<StepVersion[]> {
     await delay(100)
-    return structuredClone(this.versions[step].filter((v) => v.episode_id === episodeId))
+    return structuredClone(this.stepVersions(episodeId, step))
   }
 
-  /** §2.3 decision 语义：approve→推进；revise/regenerate→当前步出新版；rollback→上步 */
+  /** SELECT-VERSION-CONTRACT：只改审阅指针，不改 is_latest / 不删档 / 不退步 */
+  async selectVersion(episodeId: string, step: StepId, version: string, _note?: string): Promise<RunInfo> {
+    await delay(200)
+    const ep = this.epi(episodeId)
+    if (ep.current_step !== step) {
+      throw new Error(`409 只能改当前步审阅指针（current_step=${ep.current_step}, asked=${step}）`)
+    }
+    const vs = this.stepVersions(episodeId, step)
+    const target = vs.find((v) => v.version === version)
+    if (!target) throw new Error(`404 version ${version} not found`)
+    const cur = this.getCurrent(episodeId, step)
+    if (!cur) throw new Error(`${episodeId}/${step} 无可审阅版本`)
+    if (cur.status !== 'awaiting_review') {
+      throw new Error(`409 当前状态 ${cur.status}，选用仅 awaiting_review`)
+    }
+    // 幂等：已是当前审阅版
+    if (cur.version === version) {
+      return structuredClone(this.syncRun(episodeId))
+    }
+    if (cur.status === 'awaiting_review') {
+      cur.status = 'superseded'
+    }
+    target.status = 'awaiting_review'
+    this.setCurrent(episodeId, step, version)
+    // 不改任何版的 is_latest；不删任何 vN
+    ep.updated_at = now()
+    return structuredClone(this.syncRun(episodeId))
+  }
+
+  /** §2.3 decision：approve→推进；revise/regenerate→当前步出新版；rollback→上步。决策永远打在 current_version。 */
   async postDecision(episodeId: string, step: StepId, d: { version: string; action: DecisionAction; note?: string; params_override?: Record<string, unknown> }): Promise<RunInfo> {
     await delay(400)
     const ep = this.epi(episodeId)
-    const vs = this.versions[step]
-    const cur = vs.find((v) => v.episode_id === episodeId && v.is_latest)
+    const cur = this.getCurrent(episodeId, step)
     if (!cur) throw new Error(`${episodeId}/${step} 无可决策版本`)
     const rollbackOk = cur.status === 'awaiting_review' || cur.status === 'approved' || cur.status === 'failed'
     if (d.action === 'rollback') {
@@ -124,40 +191,50 @@ class MockApi implements ComicApi {
       throw new Error(`当前状态 ${cur.status}，不可决策（✅✏️🔄 仅 awaiting_review；↩️ 在 approved/failed 仍可）`)
     }
 
-    const bump = (n: number): string => {
-      const m = cur.version.match(/^v(\d+)$/)
-      return `v${(m ? Number(m[1]) : n) + 1}`
+    const bump = (): string => {
+      const nums = this.stepVersions(episodeId, step).map((v) => {
+        const m = v.version.match(/^v(\d+)$/)
+        return m ? Number(m[1]) : 0
+      })
+      return `v${Math.max(0, ...nums) + 1}`
     }
 
     if (d.action === 'approve') {
+      // 通过指针：清掉同步其他 is_latest，当前版置 latest
+      for (const v of this.stepVersions(episodeId, step)) {
+        v.is_latest = false
+      }
       cur.status = 'approved'
+      cur.is_latest = true
       const ns = nextStep(step)
       if (ns) {
         ep.current_step = ns
-        // 为下一步生成一个 awaiting_review 占位版本（mock 推进）
         this.versions[ns] = this.versions[ns].filter((v) => v.episode_id !== episodeId)
-        this.versions[ns].push(this.placeholder(episodeId, ns))
+        const ph = this.placeholder(episodeId, ns)
+        this.versions[ns].push(ph)
+        this.setCurrent(episodeId, ns, ph.version)
       } else {
         ep.status = 'done'
       }
     } else if (d.action === 'rollback') {
       const ps = prevStep(step)
       if (!ps) throw new Error('已在第一步，无法回退')
-      cur.status = 'superseded'
+      // 不删本步任何 vN；仅退 current_step
+      if (cur.status === 'awaiting_review') cur.status = 'superseded'
       ep.current_step = ps
       if (ep.status === 'done') ep.status = 'in_progress'
-      // 上步重新进入 awaiting_review
-      const pvs = this.versions[ps].filter((v) => v.episode_id === episodeId)
-      const pl = pvs.find((v) => v.is_latest)
-      if (pl) { pl.status = 'awaiting_review'; pl.is_latest = true }
+      const pl = this.getCurrent(episodeId, ps)
+      if (pl) {
+        pl.status = 'awaiting_review'
+        // is_latest 保留（通过指针不动，直至再次 approve）
+      }
     } else {
-      // revise / regenerate → 当前步出新版，仍 awaiting_review
+      // revise / regenerate → 以当前审阅版为基线出新版；不改 is_latest
       cur.status = 'superseded'
-      cur.is_latest = false
       const nv: StepVersion = {
         ...structuredClone(cur),
-        version: bump(1),
-        is_latest: true,
+        version: bump(),
+        is_latest: false,
         status: 'awaiting_review',
         seed: d.action === 'regenerate' && d.params_override?.seed != null ? Number(d.params_override.seed) : (cur.seed ?? 0) + 7,
         params: { ...(cur.params ?? {}), ...(d.params_override ?? {}) },
@@ -171,7 +248,13 @@ class MockApi implements ComicApi {
         artifacts: cur.artifacts.map((a) => ({ ...a, label: a.label + ' (重生)' })),
         failure: null,
       }
+      // 修正 archive 路径版本段
+      const dir = STEP_ARCHIVE_DIR[step]
+      nv.archive_path = `assets/${episodeId}/${dir}/${nv.version}/`
+      nv.prompt_path = `${nv.archive_path}prompt.md`
+      nv.meta_path = `${nv.archive_path}meta.md`
       this.versions[step].push(nv)
+      this.setCurrent(episodeId, step, nv.version)
     }
     ep.updated_at = now()
     return structuredClone(this.syncRun(episodeId))
@@ -205,7 +288,8 @@ class MockApi implements ComicApi {
       episode_id: episodeId,
       step,
       version: 'v1',
-      is_latest: true,
+      // is_latest 仅 approve 置位；占位待审版不是 latest
+      is_latest: false,
       status: 'awaiting_review',
       model,
       seed: Math.floor(Math.random() * 99999),
@@ -224,7 +308,6 @@ class MockApi implements ComicApi {
 
   async getPlatformHealth(): Promise<PlatformHealth> {
     await delay(100)
-    // mock：后端未就绪，如实报「未配置」（不伪造已连接）
     return {
       comfyui: { status: 'unconfigured', detail: 'mock 未配置（后端未联调）' },
       video_models: { status: 'unconfigured', detail: 'mock 未配置' },

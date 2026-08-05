@@ -40,6 +40,7 @@ body {
 .st-failed, .st-down { color: var(--err); border-color: #5a1c1c; background: #2a1010; }
 .st-superseded, .st-rejected, .st-pending, .st-paused, .st-paused_at_checkpoint { color: var(--muted); }
 .latest { font-style: normal; font-size: 10px; color: var(--accent); margin-left: 4px; }
+.reviewing { font-style: normal; font-size: 10px; color: var(--warn); margin-left: 4px; }
 
 /* layout */
 .main { flex: 1; display: grid; grid-template-columns: 340px 1fr; min-height: 0; }
@@ -111,6 +112,8 @@ h4 { margin: 16px 0 8px; font-size: 13px; color: var(--muted); text-transform: n
 .version-browser li.active button { outline: 2px solid var(--accent); }
 .vtag { font-weight: 600; }
 .version-browser .ts { grid-column: 1 / -1; font-size: 11px; color: #5c6675; }
+.vb-actions { margin-top: 10px; }
+.vb-actions .btn { width: 100%; justify-content: center; }
 
 /* step content shared */
 .docmeta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
