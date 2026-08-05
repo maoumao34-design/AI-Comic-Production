@@ -2,8 +2,8 @@
 
 > 作者 / owner：漫剧制作总控（per-step checkpoint 契约 + 每步交互规格 owner）。
 > 前端实现 owner：可视化前端工程师。技术栈：React + Vite + TypeScript（已定）。
-> 对齐：[PIPELINE-DESIGN.md](../PIPELINE-DESIGN.md) §1–§3、后端 [BACKEND-API-CONTRACT.md](./BACKEND-API-CONTRACT.md)、各步 content schema（[CONTENT-SCHEMA-01-02.md](./CONTENT-SCHEMA-01-02.md) 等）、[CHECKPOINT-CONTRACT.md](./CHECKPOINT-CONTRACT.md)。
-> 状态：v0.1，MVP 聚焦；每步深描随各步 schema 定稿再迭代。
+> 对齐：[PIPELINE-DESIGN.md](../PIPELINE-DESIGN.md) §1–§3、后端 [BACKEND-API-CONTRACT.md](./BACKEND-API-CONTRACT.md)、各步 content schema（[CONTENT-SCHEMA-01-02.md](./CONTENT-SCHEMA-01-02.md) 等）、[CHECKPOINT-CONTRACT.md](./CHECKPOINT-CONTRACT.md)、[SELECT-VERSION-CONTRACT.md](./SELECT-VERSION-CONTRACT.md)。
+> 状态：v0.1.1，MVP 聚焦 + 选用旧版 UI 增量；每步深描随各步 schema 定稿再迭代。
 >
 > 注：本文件为总控定稿的权威副本。`fe/mvp-shell` 分支早期曾由前端工程师代提交过一版（当时总控暂无 git 写权限），那版的 §5 decision 字段写的是 `new_params`，**已在此定稿版统一为 `params_override`**（与 `CHECKPOINT-CONTRACT.md`、前端 `types.ts`/`DecisionBar`、后端实现一致）。合并两分支时本文件为准。
 
@@ -17,22 +17,30 @@
 
 ## 2. 通用 StepView（每步复用同一外壳，TS）
 
-`<StepView current versions busy onDecision />`（`current` = 当前要 review 的 latest 版本）
+`<StepView current versions busy onDecision onSelectVersion />`（`current` = `GET .../current` 的**审阅版**，≠ 必然 `is_latest`）
 
-- `<StepHeader/>`：步号 · 名称 · 状态 · 版本号 · latest 标 · 模型/seed · 失败信息。
+- `<StepHeader/>`：步号 · 名称 · 状态 · 版本号 · **审阅**标（`current_version`）· **latest**标（`is_latest`）· 模型/seed · 失败信息。
 - `<StepContent step version contentSchema/>`：按步骤类型渲染该步 schema 产物。
-- `<DecisionBar onDecision/>`：✅ approve / ✏️ revise / 🔄 regenerate / ↩️ rollback；revise 点开「修改意见」输入框，regenerate 点开「换 seed」输入框。
-- `<VersionBrowser versions current onSelect/>`：版本列表 + 切换（点历史版本预览，决策仍作用于 latest）+ 对比（MVP 先做列表+切换，对比留待后续）。
+- `<DecisionBar onDecision/>`：✅ approve / ✏️ revise / 🔄 regenerate / ↩️ rollback；revise 点开「修改意见」输入框，regenerate 点开「换 seed」输入框。决策**永远**作用于 `current`（审阅版），不作用于预览态。
+- `<VersionBrowser versions current preview onPreview onSelectVersion/>`：
+  - 点击行 = **预览**（本地，不写库）。
+  - 预览非审阅版时出 **「选用此版」** → `POST .../select-version`（见 [SELECT-VERSION-CONTRACT.md](./SELECT-VERSION-CONTRACT.md)）。
+  - 徽标：**审阅** = `version == current_version`；**latest** = `is_latest`（可分属不同行）。
+  - 对比 UI 留待后续；不阻塞选用。
+
+> 作废旧句「决策作用于 latest」。应写：「决策作用于当前审阅版」。
 
 ## 3. 步骤状态机（= 后端 `step.status`）
 
 ```
 pending → running → awaiting_review →（ approve → 下一步
                                       / revise · regenerate → 重跑本步（出新版）
-                                      / rollback → 上步 ）/ failed
+                                      / rollback → 上步
+                                      / select_version(vK) → 同步 awaiting_review，current:=vK ）
+                                      / failed
 ```
 
-- decision 只在 `awaiting_review` 可点；`running` 时按钮禁用 + 显示进度/状态提示。
+- decision（✅✏️🔄）与选用旧版只在 `awaiting_review` 可点；`running` 时按钮禁用 + 显示进度/状态提示。↩️ 任意态见 #13/#14。
 
 ## 4. 每步 content 渲染（按步骤类型 switch）
 
@@ -56,13 +64,16 @@ pending → running → awaiting_review →（ approve → 下一步
 
 - 字段名 **`params_override`**：与 `CHECKPOINT-CONTRACT.md`、前端 `Decision.params_override`、后端实现一致（regenerate 可选，用来换 seed/参数）。
 - 语义对齐总控定稿的 4 动作（见 [CHECKPOINT-CONTRACT.md](./CHECKPOINT-CONTRACT.md)）：只有 `approve` 推进；`revise`/`regenerate` 重跑当前步（出新版，仍 `awaiting_review`）；`rollback` 回上一步（当前版本置 `superseded` 保留归档）。
-- 只在 `step.status = awaiting_review` 可提交；`running` 等状态后端返 409。
+- 只在 `step.status = awaiting_review` 可提交（↩️ 例外见任意态回退）；`running` 等状态后端返 409。
+- **选用旧版**不走本 Decision body；走 `POST .../select-version`（[SELECT-VERSION-CONTRACT.md](./SELECT-VERSION-CONTRACT.md)）。选用后 DecisionBar 仍对更新后的 `current` 提交上表四动作。
 
 ## 6. MVP 范围
 
 对话区 stub + 工作区单步 StepView + 四按钮 + 版本列表，先跑通主链路：
 
 > 选/建集 → 发起 run → 某步 `awaiting_review` → 点 ✅ → 推进
+
+**下一小步（选用旧版）**：VersionBrowser「选用此版」+ BE `select-version` + mock 同步；联调清单见 SELECT-VERSION-CONTRACT §6。
 
 附：内置 mock 后端（`api/mock.ts`）完整模拟上述 decision 语义，后端未就绪也能跑通主链路；后端就绪切 `api/client.ts`（RealApi，打 `/api/v1`），前端代码无需改。
 
