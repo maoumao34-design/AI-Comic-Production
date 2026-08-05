@@ -1,21 +1,26 @@
 import { useState } from 'react'
-import type { DecisionAction } from '../types'
+import type { DecisionAction, StepId } from '../types'
 import { DECISION_META } from '../types'
 
 interface Props {
   status: string
+  step?: StepId
   busy?: boolean
   onDecision: (action: DecisionAction, note?: string, paramsOverride?: Record<string, unknown>) => Promise<void>
 }
 
 const ORDER: DecisionAction[] = ['approve', 'revise', 'regenerate', 'rollback']
 
-/** §2.3 / PER-STEP-UI-SPEC §2、§5：四按钮，只在 awaiting_review 可点 */
-export function DecisionBar({ status, busy, onDecision }: Props) {
+/** 可打回重做的版本态：人审中 / 已通过 / 失败（成片后仍可 ↩️） */
+const ROLLBACKABLE = new Set(['awaiting_review', 'approved', 'failed'])
+
+/** §2.3：✅✏️🔄 仅 awaiting_review；↩️ 任意可评审态均可（含 approved/done 打回），01 无上步除外 */
+export function DecisionBar({ status, step, busy, onDecision }: Props) {
   const [active, setActive] = useState<DecisionAction | null>(null)
   const [note, setNote] = useState('')
   const [seed, setSeed] = useState('')
   const reviewable = status === 'awaiting_review'
+  const canRollback = ROLLBACKABLE.has(status) && step !== '01'
 
   const reset = () => {
     setActive(null)
@@ -37,13 +42,14 @@ export function DecisionBar({ status, busy, onDecision }: Props) {
       <div className="btns">
         {ORDER.map((a) => {
           const m = DECISION_META[a]
-          const disabled = !reviewable || busy
+          const enabled = a === 'rollback' ? canRollback : reviewable
+          const disabled = !enabled || !!busy
           return (
             <button
               key={a}
               className={`btn ${a} ${active === a ? 'active' : ''}`}
               disabled={disabled}
-              title={m.hint}
+              title={a === 'rollback' && step === '01' ? '已在第一步，无法回退' : m.hint}
               onClick={() => (a === 'revise' || a === 'regenerate' ? setActive(a) : onDecision(a))}
             >
               <span className="ic">{m.icon}</span>
@@ -53,8 +59,11 @@ export function DecisionBar({ status, busy, onDecision }: Props) {
         })}
       </div>
 
-      {!reviewable && status !== 'awaiting_review' && (
-        <div className="status-note">当前状态「{status}」，决策按钮仅在 awaiting_review 时可用。</div>
+      {!reviewable && (
+        <div className="status-note">
+          当前状态「{status}」：✅✏️🔄 仅 awaiting_review 可用
+          {canRollback ? '；↩️ 仍可回退打回上一步' : step === '01' ? '；已在第一步，无法回退' : '；当前态不可回退'}。
+        </div>
       )}
 
       {active === 'revise' && (

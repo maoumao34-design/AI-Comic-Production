@@ -49,6 +49,24 @@ async function main() {
   assert(afterRollback.current_step === '02', `rollback 03 returns to 02 (got ${afterRollback.current_step})`)
   console.log('  after rollback 03 ->', STEP_LABELS[afterRollback.current_step])
 
+  // 成片后仍可 ↩️：推进到 done，再从 approved 末步回退
+  let step: '02' | '03' | '04' | '05' | '06' | '07' = '02'
+  while (true) {
+    const cur = await mockApi.getCurrentVersion('EP-01', step)
+    const r = await mockApi.postDecision('EP-01', step, { version: cur.version, action: 'approve' })
+    if (r.status === 'done' || !r.current_step || r.current_step === step) break
+    step = r.current_step as typeof step
+  }
+  const epDone = await mockApi.getEpisode('EP-01')
+  assert(epDone.status === 'done', `episode reaches done (got ${epDone.status})`)
+  const cur07 = await mockApi.getCurrentVersion('EP-01', '07')
+  assert(cur07.status === 'approved', `07 is approved after done (got ${cur07.status})`)
+  const afterDoneRollback = await mockApi.postDecision('EP-01', '07', { version: cur07.version, action: 'rollback' })
+  assert(afterDoneRollback.current_step === '06', `rollback after done 07 → 06 (got ${afterDoneRollback.current_step})`)
+  const epReopen = await mockApi.getEpisode('EP-01')
+  assert(epReopen.status === 'in_progress', `done → rollback reopens episode (got ${epReopen.status})`)
+  console.log('  after done-rollback 07 ->', STEP_LABELS[afterDoneRollback.current_step], 'ep:', epReopen.status)
+
   const h = await mockApi.getPlatformHealth()
   assert(h.comfyui.status === 'unconfigured', `platform health honest: comfyui unconfigured`)
 

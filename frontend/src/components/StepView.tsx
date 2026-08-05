@@ -80,7 +80,7 @@ export function StepView({ current, versions, busy, health, onDecision }: Props)
         </section>
 
         <footer className="step-foot">
-          <DecisionBar status={current.status} busy={busy} onDecision={handleDecision} />
+          <DecisionBar status={current.status} step={current.step} busy={busy} onDecision={handleDecision} />
         </footer>
       </div>
 

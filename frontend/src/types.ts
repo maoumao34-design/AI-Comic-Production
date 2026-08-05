@@ -36,6 +36,7 @@ export type StepVersionStatus =
   | 'approved'
   | 'rejected'
   | 'superseded'
+  | 'failed'
 
 /** Run 状态 */
 export type RunStatus = 'running' | 'paused_at_checkpoint' | 'done' | 'failed' | 'paused'
