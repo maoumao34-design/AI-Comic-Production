@@ -81,6 +81,8 @@
 > - `rollback` ↩️ → 回**上一步** checkpoint 重做（当前版本保留归档）
 >
 > 只有 `approve` 推进；`revise`/`regenerate` 都重跑当前步（区别=revise 带编辑意见、regenerate 纯换参）；`rollback` 退上一步。每次 decision 记可回溯字段（动作 + 修改意见/新参数 + 操作人 + 时间）进 `meta.md`/`params.json`。
+>
+> **Gate（2026-08-05 maozh2 打回需求）**：`approve` / `revise` / `regenerate` 仅 `awaiting_review` 可提交；**`rollback` 在 `awaiting_review` / `approved` / `failed` 均可**（含 07 approve 后 run/episode=`done`——打回后 ep→`in_progress`、run→`paused_at_checkpoint`、上一步版本重回 `awaiting_review`）。步骤 `01` 无上一步 → 409。`running` 等态仍 409。
 
 ---
 

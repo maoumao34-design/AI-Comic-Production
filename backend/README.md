@@ -22,7 +22,7 @@ node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --ckpt 你�
 
 ## 它实现了什么（MVP 闭环）
 - **7 步状态机**（01剧本→02分镜→03资产→04关键帧→05分段视频→06配音字幕→07成片）
-- **4 个 decision**（总控定稿）：`approve`✅推进 / `revise`✏️带意见重跑当前步 / `regenerate`🔄换参重跑当前步 / `rollback`↩️回上一步（仅 approve 推进）
+- **4 个 decision**（总控定稿）：`approve`✅推进 / `revise`✏️带意见重跑当前步 / `regenerate`🔄换参重跑当前步 / `rollback`↩️回上一步（仅 approve 推进；rollback 在 approved/failed/done 仍可打回）
 - **版本归档**：默认 `assets/<集号>/<步骤>/<版本>/{prompt.md,params.json,refs/,output.*,meta.md}` + `latest` 指针（可用 `ASSETS_DIR` 覆盖）
 - **每步平台槽**：`GET /pipeline/platforms`（03/04→ComfyUI；05 多候选 needs_decision；06→ElevenLabs；07→local_compose）
 - **失败/重试**：超 `FAIL_THRESHOLD`(默认3) → `paused`（escalation，不无限重跑）

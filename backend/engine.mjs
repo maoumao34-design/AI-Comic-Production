@@ -235,22 +235,42 @@ function versionView(svObj, version) {
   return { ...v };
 }
 
+/** 可打回态：人审中 / 已通过 / 失败（成片 done 后仍可 ↩️） */
+const ROLLBACKABLE = new Set(["awaiting_review", "approved", "failed"]);
+
 /**
  * 提交 decision（唯一推进流水线的入口）。语义=总控定稿（见 BACKEND-API-CONTRACT §2.3）。
  * approve→推进下一步；revise→带 note 重跑当前步；regenerate→换参重跑当前步；rollback→回上一步。
+ * rollback 例外：approved/failed/done 仍可打回（maozh2 2026-08-05）；✅✏️🔄 仍仅 awaiting_review。
  */
 export async function submitDecision(episodeId, stepId, decision) {
   const ep = episodes.get(episodeId); if (!ep) throw { status: 404, message: "episode not found" };
   const r = activeRun(episodeId); if (!r) throw { status: 404, message: "no active run" };
   const svObj = r.steps[stepId]; if (!svObj) throw { status: 404, message: "step not found" };
-  if (svObj.status !== "awaiting_review") throw { status: 409, message: `step not awaiting_review (now ${svObj.status})` };
   const cur = svObj.versions.find((x) => x.version === svObj.current_version);
-  const rec = { action: decision.action, note: decision.note || null,
+  if (!cur) throw { status: 404, message: "no current version" };
+
+  const action = decision.action;
+  const verStatus = cur.status;
+  if (action === "rollback") {
+    if (!ROLLBACKABLE.has(verStatus) && !ROLLBACKABLE.has(svObj.status)) {
+      throw { status: 409, message: `step not rollbackable (now ${verStatus})` };
+    }
+  } else if (action === "approve" || action === "revise" || action === "regenerate") {
+    if (svObj.status !== "awaiting_review" && verStatus !== "awaiting_review") {
+      throw { status: 409, message: `step not awaiting_review (now ${verStatus})` };
+    }
+  } else {
+    throw { status: 400, message: `unknown action: ${action}` };
+  }
+
+  const rec = { action, note: decision.note || null,
     params_override: decision.params_override || null, operator: decision.operator || "maozh2", at: now() };
   cur.decision_history.push(rec);
 
-  if (decision.action === "approve") {
+  if (action === "approve") {
     cur.status = "approved"; cur.is_latest = true;
+    svObj.status = "approved";
     // 旧 latest 取消
     for (const x of svObj.versions) if (x !== cur) x.is_latest = false;
     const idx = STEPS.findIndex((s) => s.id === stepId);
@@ -261,21 +281,26 @@ export async function submitDecision(episodeId, stepId, decision) {
       await runStep(r, nextId_, {});
       r.status = (r.steps[nextId_].status === "paused") ? "paused" : "paused_at_checkpoint";
     }
-  } else if (decision.action === "revise" || decision.action === "regenerate") {
+  } else if (action === "revise" || action === "regenerate") {
     // 重跑当前步（revise 带 note；regenerate 纯换参）
     await runStep(r, stepId, { note: decision.note, params_override: decision.params_override, seed: decision.params_override?.seed });
     r.status = (r.steps[stepId].status === "paused") ? "paused" : "paused_at_checkpoint";
-  } else if (decision.action === "rollback") {
-    cur.status = "superseded";
+  } else if (action === "rollback") {
     const idx = STEPS.findIndex((s) => s.id === stepId);
-    if (idx > 0) {
-      const prev = STEPS[idx - 1].id;
-      r.current_step = prev; ep.current_step = prev;
-      r.steps[prev].status = "awaiting_review"; // 回到上一步重做（重新评审）
+    if (idx <= 0) throw { status: 409, message: "already at first step; cannot rollback" };
+    cur.status = "superseded";
+    svObj.status = "superseded";
+    const prev = STEPS[idx - 1].id;
+    r.current_step = prev; ep.current_step = prev;
+    const prevSv = r.steps[prev];
+    prevSv.status = "awaiting_review"; // 回到上一步重做（重新评审）
+    const prevCur = prevSv.versions.find((x) => x.version === prevSv.current_version);
+    // 打回后上一步版本重新进入人审（归档保留；is_latest 仍指该版直到再 approve）
+    if (prevCur && (prevCur.status === "approved" || prevCur.status === "superseded")) {
+      prevCur.status = "awaiting_review";
     }
+    if (r.status === "done" || ep.status === "done") ep.status = "in_progress";
     r.status = "paused_at_checkpoint";
-  } else {
-    throw { status: 400, message: `unknown action: ${decision.action}` };
   }
   ep.updated_at = now();
   return { run_id: r.run_id, status: r.status, current_step: r.current_step,
