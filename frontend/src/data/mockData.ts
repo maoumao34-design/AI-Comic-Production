@@ -57,7 +57,7 @@ export const SEED_VERSIONS: Record<StepId, StepVersion[]> = {
   ],
   '02': [
     {
-      episode_id: 'EP-01', step: '02', version: 'v1', is_latest: true, status: 'awaiting_review',
+      episode_id: 'EP-01', step: '02', version: 'v1', is_latest: false, status: 'awaiting_review',
       model: 'claude-sonnet', seed: 202,
       params: { source_narration_version: 'v1' },
       artifacts: [P('分镜表 v1', '/assets/EP-01/02-storyboard/v1/storyboard.md')],

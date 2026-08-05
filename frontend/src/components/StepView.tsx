@@ -15,10 +15,11 @@ interface Props {
   busy?: boolean
   health?: PlatformHealth
   onDecision: (action: DecisionAction, note?: string, paramsOverride?: Record<string, unknown>) => Promise<void>
+  onSelectVersion?: (version: StepVersion) => Promise<void>
 }
 
 /** 通用 StepView 外壳：平台槽位 + StepHeader + StepContent + DecisionBar + VersionBrowser + 接手面板 */
-export function StepView({ current, versions, busy, health, onDecision }: Props) {
+export function StepView({ current, versions, busy, health, onDecision, onSelectVersion }: Props) {
   const [preview, setPreview] = useState<StepVersion | null>(null)
   const slot = STEP_PLATFORM_SLOTS[current.step]
   const [provider, setProvider] = useState<PlatformId>(slot.primary.id)
@@ -57,7 +58,11 @@ export function StepView({ current, versions, busy, health, onDecision }: Props)
         <header className="step-header">
           <div className="title">{STEP_LABELS[current.step]}</div>
           <div className="sub">
-            <span>版本 <b>{current.version}</b>{current.is_latest && <em className="latest">latest</em>}</span>
+            <span>
+              版本 <b>{current.version}</b>
+              <em className="reviewing">审阅</em>
+              {current.is_latest && <em className="latest">latest</em>}
+            </span>
             <span className={`st st-${current.status}`}>{current.status}</span>
             {current.model && <span className="muted">· {current.model} · seed {current.seed ?? '—'}</span>}
             {current.failure && <span className="st st-failed">FAILED: {current.failure.reason}</span>}
@@ -72,7 +77,9 @@ export function StepView({ current, versions, busy, health, onDecision }: Props)
         />
 
         {!isReviewingCurrent && (
-          <div className="callout warn">正在预览历史版本 {viewing.version}（{viewing.status}）。决策作用于 latest {current.version}，点版本列表的 {current.version} 回到当前。</div>
+          <div className="callout warn">
+            正在预览 {viewing.version}（只读）。点「选用此版」后，✅/✏️/🔄 将作用于该版；不会删除更新的版本，也不会退到上一步。
+          </div>
         )}
 
         <section className="step-content">
@@ -85,7 +92,14 @@ export function StepView({ current, versions, busy, health, onDecision }: Props)
       </div>
 
       <aside className="step-side">
-        <VersionBrowser versions={versions} current={viewing} onSelect={setPreview} />
+        <VersionBrowser
+          versions={versions}
+          current={current}
+          preview={preview}
+          onPreview={setPreview}
+          onSelectVersion={onSelectVersion ? (v) => { void onSelectVersion(v) } : undefined}
+          busy={busy}
+        />
         <HandoffPanel version={viewing} />
       </aside>
     </div>

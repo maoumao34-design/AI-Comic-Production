@@ -82,6 +82,14 @@ class RealApi implements ComicApi {
     })
     return this.getRun(j.result.run_id)
   }
+  /** SELECT-VERSION-CONTRACT：POST .../select-version；响应同 decision 瘦身 */
+  async selectVersion(id: string, step: StepId, version: string, note?: string): Promise<RunInfo> {
+    const j = await this.req<{ result: { run_id: string } }>(`/episodes/${id}/steps/${step}/select-version`, {
+      method: 'POST',
+      body: JSON.stringify({ version, note, client_request_id: crypto.randomUUID() }),
+    })
+    return this.getRun(j.result.run_id)
+  }
   async getPlatformHealth(): Promise<PlatformHealth> {
     return this.req<PlatformHealth>('/health/platforms')
   }
