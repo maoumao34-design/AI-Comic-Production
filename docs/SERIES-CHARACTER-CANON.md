@@ -2,7 +2,8 @@
 
 > 响应导演（maozh2）要求：同一部剧不同集的相同人物必须连贯；**每集最终采用的素材保留，供后续集作参考**，避免角色漂移。  
 > Owner：ComfyUI 平台集成（路径/胶水/归档）；出图仍走有 GPU 的本机 agent。  
-> 对齐：`PIPELINE-DESIGN.md` §3 · `STEP-CONTENT-SCHEMA-03-04-05.md`（`consistency_ref`）· EP01 handoff。
+> 对齐：`PIPELINE-DESIGN.md` §3 · `STEP-CONTENT-SCHEMA-03-04-05.md`（`consistency_ref`）· EP01 handoff。  
+> 文本侧角色 bible（编剧）：`assets/_shared/characters.md`（branch `script/series-character-bible`）——本文件管**定稿图像资产**晋升与引用，不替代文字设定。
 
 ## 1. 原则
 
