@@ -101,13 +101,13 @@
 | `shot_id` | string | ✓ | 如 `"s1"` |
 | `linked_beat_id` | string | ✓ | 外键 → 01 `beats[].beat_id`；**每条旁白至少 1 个镜头** |
 | `shot_no` | string | ✓ | 镜头号，如 `"S1"`、`"S2"` |
-| `characters` | string[] | ✓ | 出场人物（引用 `assets/_shared/characters.md`） |
+| `characters` | string[] | ✓ | 出场人物展示名；**必须能在 `assets/_shared/characters.md` 查到** |
 | `action` | string | ✓ | 动作（可被生成/可拍到） |
 | `scene` | string | ✓ | 场景 |
 | `evidence_visual` | string | ✓ | 证据画面要素（具体、可生成） |
 | `shot_type` | string | | 景别：特写/近景/中景/全景/远景 |
 | `duration_sec` | number | | 本镜预估时长 |
-| `ref_image_slot` | string\|null | | 参考图位 → 步骤 03/04 一致性资产引用（占位，资产定稿后回填） |
+| `ref_image_slot` | string\|null | | 参考图位；`char/<ref_slot>` 段必须命中角色圣经；资产定稿后回填 series approved 指针 |
 | `notes` | string | | 备注（衔接、音效点、字幕安全区提示等） |
 
 ### 2.3 JSON 范例（02）
@@ -134,6 +134,13 @@
 - **每个 beat 至少被 1 个 shot 引用**（不允许"有旁白无画面"）。
 - 01 改版（v1→v2）后，02 的 `source_narration.version` 跟着升，并重检外键；02 产出归档到自己的版本目录。
 - 前端评审：选中某镜头 → 高亮对应旁白（beat）；✏️ 修改要能回写到具体 beat/shot。
+
+## 3.1 跨集人物连贯（系列级）
+
+- SSOT：[`assets/_shared/characters.md`](../assets/_shared/characters.md)（稳定 `char_id` / `ref_slot` / 展示名）。
+- 同剧后续集复用同一 `char_id`；新角色先改圣经再写分镜。
+- `ref_image_slot` 中的 `char/*` 与圣经 `ref_slot` 对齐；步骤 03 人审通过后由工程侧挂 series approved 指针（不改已通过的 01/02 正文）。
+- 筛镜头「采用」≠进系列库；仅 checkpoint 完全通过后才挂 series 指针。
 
 ## 4. 待确认规格的影响
 
