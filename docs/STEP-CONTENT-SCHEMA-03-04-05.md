@@ -23,9 +23,9 @@
 - `subject_type`：character \| costume \| expression \| scene \| prop
 - `subject_id`：角色/场景/道具 ID
 - `views`：character 时 front / side / back（三视图，各一条 output，或一图多 view）
-- `consistency_ref`：跨集基准资产 ID（定稿后复用，后续集 + 04/05 引用它）
+- `consistency_ref`：跨集基准路径（定稿晋升后），形如 `assets/_series/<series_id>/characters/<subject_id>/latest/`（见 [`SERIES-CHARACTER-CANON.md`](./SERIES-CHARACTER-CANON.md)）
 - `consistency_check`：`{passed: bool, issues: []}`（角色一致性自检结果）
-- 定稿后 `status=locked`，作为 04/05 的基准资产入口
+- 定稿后 `status=locked`，**集内**作 04/05 入口；同时 `canon-promote` 写入系列库供 EP-02+ 复用
 
 ## 04 关键帧（每帧一条）
 - `kf_id`

@@ -5,12 +5,16 @@
  *
  *   node scripts/ep01-cli.mjs doctor [--base-url http://127.0.0.1:8188]
  *   node scripts/ep01-cli.mjs handoff-check --episode EP-01 --version v1
+ *   node scripts/ep01-cli.mjs canon-init --series heiress-blacklisted
+ *   node scripts/ep01-cli.mjs canon-promote --series heiress-blacklisted --episode EP-01 --version v1
+ *   node scripts/ep01-cli.mjs canon-check --series heiress-blacklisted [--episode EP-01]
  *   node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1
  *   node scripts/ep01-cli.mjs run --episode EP-01 --from 04 --to 07 --dry-run
  *   node scripts/ep01-cli.mjs run --episode EP-01 --from 03 --to 07 --pause-each-step
  *
  * Reads assets/<ep>/<stepDir>/<ver>/{prompt.md,params.json}
  * Writes assets/<ep>/<stepDir>/<ver>/outputs/<subject>/...
+ * Series canon: assets/_series/<series_id>/ (docs/SERIES-CHARACTER-CANON.md)
  * Never fakes images. Steps 05–07 stay honest stubs until video/TTS glue lands.
  * --dry-run scaffolds 05–07 archive dirs without claiming real generation.
  */
@@ -33,6 +37,7 @@ const STEP_DIR = {
 };
 
 const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
+const DEFAULT_SERIES = "heiress-blacklisted";
 
 const DEFAULT_NEG =
   "deformed hands, extra fingers, watermark, subtitle burn-in, logo spam, inconsistent face across views, blurry, low quality";
@@ -53,12 +58,66 @@ function usage() {
   console.log(`Usage:
   node scripts/ep01-cli.mjs doctor [--base-url http://127.0.0.1:8188]
   node scripts/ep01-cli.mjs handoff-check --episode EP-01 --version v1
+  node scripts/ep01-cli.mjs canon-init --series heiress-blacklisted
+  node scripts/ep01-cli.mjs canon-promote --series heiress-blacklisted --episode EP-01 --version v1
+  node scripts/ep01-cli.mjs canon-check --series heiress-blacklisted [--episode EP-01]
   node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 [--subject char/serena] [--ckpt FILE] [--dry-run] [--seed N]
   node scripts/ep01-cli.mjs run --episode EP-01 --from 04 --to 07 --version v1 --dry-run
   node scripts/ep01-cli.mjs run --episode EP-01 --from 03 --to 07 --pause-each-step [--version v1]
 
 Env: COMFYUI_BASE_URL (required for generate), optional COMFYUI_API_KEY / COMFYUI_CKPT
-Docs: docs/EP01-GPU-AGENT-HANDOFF.md · docs/EP01-LOCAL-GPU-RUN.md · docs/LOCAL-GPU-RUNBOOK.md`);
+Docs: docs/SERIES-CHARACTER-CANON.md · docs/EP01-GPU-AGENT-HANDOFF.md · docs/EP01-LOCAL-GPU-RUN.md`);
+}
+
+function seriesRoot(seriesId) {
+  return path.join(REPO_ROOT, "assets", "_series", seriesId);
+}
+
+function seriesIndexPath(seriesId) {
+  return path.join(seriesRoot(seriesId), "index.json");
+}
+
+async function readSeriesIndex(seriesId) {
+  const p = seriesIndexPath(seriesId);
+  if (!(await pathExists(p))) return null;
+  return JSON.parse(await fs.readFile(p, "utf8"));
+}
+
+async function writeSeriesIndex(seriesId, index) {
+  const root = seriesRoot(seriesId);
+  await fs.mkdir(root, { recursive: true });
+  index.updated_at = now();
+  await fs.writeFile(seriesIndexPath(seriesId), JSON.stringify(index, null, 2) + "\n");
+}
+
+async function summarizeSeriesCanon(seriesId, episode) {
+  const index = await readSeriesIndex(seriesId);
+  if (!index) {
+    return { series: seriesId, present: false, hint: `node scripts/ep01-cli.mjs canon-init --series ${seriesId}` };
+  }
+  const chars = index.characters || {};
+  const rows = Object.entries(chars).map(([id, meta]) => ({
+    subject: id,
+    status: meta.status || null,
+    latest: meta.latest || null,
+    source_episode: meta.source_episode || null,
+  }));
+  const locked = rows.filter((r) => r.status === "locked").length;
+  const awaiting = rows.filter((r) => r.status === "awaiting_source_images").length;
+  return {
+    series: seriesId,
+    present: true,
+    index: path.relative(REPO_ROOT, seriesIndexPath(seriesId)).replace(/\\/g, "/"),
+    characters_total: rows.length,
+    locked,
+    awaiting_source_images: awaiting,
+    characters: rows,
+    doc: "docs/SERIES-CHARACTER-CANON.md",
+    next:
+      locked === rows.length && rows.length > 0
+        ? `canon ready for ${episode || "next episode"} refs`
+        : `after EP step03 approve: node scripts/ep01-cli.mjs canon-promote --series ${seriesId} --episode ${episode || "EP-01"} --version v1`,
+  };
 }
 
 async function pathExists(p) {
@@ -173,9 +232,211 @@ async function cmdHandoffCheck() {
     };
   }
 
+  report.series_canon = await summarizeSeriesCanon(arg("series", DEFAULT_SERIES), episode);
+
   console.log(JSON.stringify(report, null, 2));
   // exit 0 always for probe; missing images are listed, not a hard fail (GPU handoff pending)
   process.exit(0);
+}
+
+async function cmdCanonInit() {
+  const seriesId = arg("series", DEFAULT_SERIES);
+  const title = arg("title", "The Heiress Blacklisted Her Husband");
+  const existing = await readSeriesIndex(seriesId);
+  if (existing && !flag("force")) {
+    console.log(JSON.stringify({ command: "canon-init", series: seriesId, status: "already_exists", index: existing }, null, 2));
+    process.exit(0);
+  }
+  const chars = ["char/serena", "char/james", "char/amy", "char/kate"];
+  const characters = {};
+  for (const id of chars) {
+    const rel = `assets/_series/${seriesId}/characters/${id}/`;
+    await fs.mkdir(path.join(REPO_ROOT, rel), { recursive: true });
+    characters[id] = {
+      status: "awaiting_source_images",
+      latest: null,
+      source_episode: null,
+      path: rel,
+    };
+  }
+  const index = {
+    series_id: seriesId,
+    title,
+    schema: "docs/SERIES-CHARACTER-CANON.md",
+    created_at: now(),
+    updated_at: now(),
+    characters,
+    note: "Scaffold only; promote after episode step03 approve with real images.",
+  };
+  await writeSeriesIndex(seriesId, index);
+  const readme = path.join(seriesRoot(seriesId), "README.md");
+  if (!(await pathExists(readme))) {
+    await fs.writeFile(
+      readme,
+      `# Series canon — ${seriesId}\n\nSee docs/SERIES-CHARACTER-CANON.md\n`,
+    );
+  }
+  console.log(
+    JSON.stringify(
+      {
+        command: "canon-init",
+        series: seriesId,
+        status: "ok",
+        index: path.relative(REPO_ROOT, seriesIndexPath(seriesId)).replace(/\\/g, "/"),
+        characters: chars,
+      },
+      null,
+      2,
+    ),
+  );
+  process.exit(0);
+}
+
+async function cmdCanonPromote() {
+  const seriesId = arg("series", DEFAULT_SERIES);
+  const episode = arg("episode", "EP-01");
+  const version = arg("version", "v1");
+  const allowEmpty = flag("allow-empty");
+  let index = await readSeriesIndex(seriesId);
+  if (!index) {
+    console.error(`series index missing; run canon-init --series ${seriesId} first`);
+    process.exit(2);
+  }
+
+  const step03Root = path.join(REPO_ROOT, "assets", episode, STEP_DIR["03"], version);
+  const paramsPath = path.join(step03Root, "params.json");
+  if (!(await pathExists(paramsPath))) {
+    console.error(`missing ${path.relative(REPO_ROOT, paramsPath)}`);
+    process.exit(2);
+  }
+  const params = JSON.parse(await fs.readFile(paramsPath, "utf8"));
+  const characterIds = Array.isArray(params?.subjects_planned?.characters)
+    ? params.subjects_planned.characters
+    : Object.keys(index.characters || {});
+
+  const promoted = [];
+  const skipped = [];
+  for (const sid of characterIds) {
+    const srcDir = path.join(step03Root, "outputs", sid);
+    const images = await listImageFiles(srcDir);
+    const charRoot = path.join(seriesRoot(seriesId), "characters", sid);
+    const verName = version;
+    const destDir = path.join(charRoot, verName);
+    await fs.mkdir(destDir, { recursive: true });
+
+    const sourceMeta = {
+      series_id: seriesId,
+      subject_id: sid,
+      source_episode: episode,
+      source_step: "03-assets",
+      source_version: version,
+      source_path: path.relative(REPO_ROOT, srcDir).replace(/\\/g, "/") + "/",
+      promoted_at: now(),
+      image_count: images.length,
+    };
+    await fs.writeFile(path.join(destDir, "source_episode.json"), JSON.stringify(sourceMeta, null, 2) + "\n");
+
+    if (images.length === 0) {
+      if (!allowEmpty && !params.images_generated) {
+        await fs.writeFile(
+          path.join(destDir, "meta.md"),
+          `# meta\n\n- status: awaiting_source_images\n- note: no images under episode outputs; not locked\n- at: ${now()}\n`,
+        );
+        index.characters = index.characters || {};
+        index.characters[sid] = {
+          status: "awaiting_source_images",
+          latest: null,
+          source_episode: `${episode}/03-assets/${version}`,
+          path: path.relative(REPO_ROOT, charRoot).replace(/\\/g, "/") + "/",
+        };
+        skipped.push({ subject: sid, reason: "no_images" });
+        continue;
+      }
+      if (!allowEmpty) {
+        skipped.push({ subject: sid, reason: "no_images_use_--allow-empty_to_record_pointer" });
+        continue;
+      }
+    }
+
+    // copy images when present
+    if (images.length) {
+      const outDir = path.join(destDir, "outputs");
+      await fs.mkdir(outDir, { recursive: true });
+      for (const img of images) {
+        const base = path.basename(img);
+        await fs.copyFile(img, path.join(outDir, base));
+      }
+      await fs.writeFile(
+        path.join(destDir, "meta.md"),
+        `# meta\n\n- status: locked\n- source: ${episode}/03-assets/${version}\n- images: ${images.length}\n- at: ${now()}\n`,
+      );
+      await fs.writeFile(
+        path.join(charRoot, "README.md"),
+        `# ${sid}\n\nlatest: ${verName}\n\nconsistency_ref: assets/_series/${seriesId}/characters/${sid}/${verName}/\n`,
+      );
+      index.characters = index.characters || {};
+      index.characters[sid] = {
+        status: "locked",
+        latest: verName,
+        source_episode: `${episode}/03-assets/${version}`,
+        path: path.relative(REPO_ROOT, charRoot).replace(/\\/g, "/") + "/",
+        consistency_ref: `assets/_series/${seriesId}/characters/${sid}/${verName}/`,
+      };
+      promoted.push({ subject: sid, version: verName, images: images.length, status: "locked" });
+    } else {
+      index.characters = index.characters || {};
+      index.characters[sid] = {
+        status: "awaiting_source_images",
+        latest: null,
+        source_episode: `${episode}/03-assets/${version}`,
+        path: path.relative(REPO_ROOT, charRoot).replace(/\\/g, "/") + "/",
+      };
+      promoted.push({ subject: sid, version: verName, images: 0, status: "awaiting_source_images" });
+    }
+  }
+
+  index.note =
+    promoted.some((p) => p.status === "locked")
+      ? "Characters promoted; use consistency_ref on EP-02+."
+      : "Promote recorded pointers only; awaiting real step03 images + maozh2 approve.";
+  await writeSeriesIndex(seriesId, index);
+
+  console.log(
+    JSON.stringify(
+      {
+        command: "canon-promote",
+        series: seriesId,
+        episode,
+        version,
+        promoted,
+        skipped,
+        index: path.relative(REPO_ROOT, seriesIndexPath(seriesId)).replace(/\\/g, "/"),
+        doc: "docs/SERIES-CHARACTER-CANON.md",
+      },
+      null,
+      2,
+    ),
+  );
+  process.exit(0);
+}
+
+async function cmdCanonCheck() {
+  const seriesId = arg("series", DEFAULT_SERIES);
+  const episode = arg("episode", "EP-01");
+  const summary = await summarizeSeriesCanon(seriesId, episode);
+  const ok = summary.present && summary.locked === summary.characters_total && summary.characters_total > 0;
+  console.log(
+    JSON.stringify(
+      {
+        command: "canon-check",
+        ready_for_cross_episode_refs: ok,
+        ...summary,
+      },
+      null,
+      2,
+    ),
+  );
+  process.exit(ok ? 0 : 1);
 }
 
 function flattenSubjects(params) {
@@ -633,6 +894,9 @@ async function main() {
   }
   if (cmd === "doctor") return cmdDoctor();
   if (cmd === "handoff-check") return cmdHandoffCheck();
+  if (cmd === "canon-init") return cmdCanonInit();
+  if (cmd === "canon-promote") return cmdCanonPromote();
+  if (cmd === "canon-check") return cmdCanonCheck();
   if (cmd === "run") return cmdRun();
   console.error(`unknown command: ${cmd}`);
   usage();

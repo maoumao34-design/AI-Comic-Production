@@ -85,6 +85,7 @@ node scripts/ep01-cli.mjs handoff-check --episode EP-01 --version v1
 | 03 真出图 + 落盘 | **导演本机本地 agent**（maozh2 GPU 机） | Comfy 出图 → `outputs/<subject_id>/` |
 | 03 回灌入库 / 路径核对 | **ComfyUI 平台集成** | `handoff-check`、必要时修 meta；不代跑 GPU |
 | 【CHECKPOINT 03】人审 | **maozh2** | ✅ / ✏️ / ↩️ / 🔄 |
+| 角色晋升系列 canon | **ComfyUI 平台集成** | 人审 ✅ 后 `canon-promote`（见 [`SERIES-CHARACTER-CANON.md`](./SERIES-CHARACTER-CANON.md)），防跨集脸漂 |
 | 04 关键帧生成 | 导演 GPU agent（或同机 CLI） | `ep01-cli --step 04`；引用已锁 03 |
 | 04–07 筛选 / 归档 / 人审编排 | **总控** + maozh2 checkpoint | 按 PIPELINE 逐步推进 |
 | 05–07 一键生成 | **缺口**（见下） | 手工落盘或等视频/TTS/成片胶水 |
