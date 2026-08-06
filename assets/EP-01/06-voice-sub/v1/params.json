@@ -1,0 +1,12 @@
+{
+  "episode": "EP-01",
+  "step": "06-voice-sub",
+  "version": "v1",
+  "status": "dry_run_scaffold",
+  "images_generated": false,
+  "real_generation": false,
+  "cli": "scripts/ep01-cli.mjs",
+  "created_at": "2026-08-06T03:27:21.322Z",
+  "handoff": "docs/EP01-GPU-AGENT-HANDOFF.md",
+  "detail": "step 06 (voice+sub) needs ElevenLabs (or local TTS) — not wired. Put VO/SRT under assets/.../06-voice-sub/<ver>/ when ready."
+}

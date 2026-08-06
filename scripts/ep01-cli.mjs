@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 /**
  * EP-01 local GPU CLI — matches docs/EP01-LOCAL-GPU-RUN.md §1.5
+ * Handoff / 回灌: docs/EP01-GPU-AGENT-HANDOFF.md
  *
  *   node scripts/ep01-cli.mjs doctor [--base-url http://127.0.0.1:8188]
+ *   node scripts/ep01-cli.mjs handoff-check --episode EP-01 --version v1
  *   node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1
+ *   node scripts/ep01-cli.mjs run --episode EP-01 --from 04 --to 07 --dry-run
  *   node scripts/ep01-cli.mjs run --episode EP-01 --from 03 --to 07 --pause-each-step
  *
  * Reads assets/<ep>/<stepDir>/<ver>/{prompt.md,params.json}
  * Writes assets/<ep>/<stepDir>/<ver>/outputs/<subject>/...
  * Never fakes images. Steps 05–07 stay honest stubs until video/TTS glue lands.
+ * --dry-run scaffolds 05–07 archive dirs without claiming real generation.
  */
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -19,13 +23,16 @@ import * as comfy from "../backend/platforms/comfyui.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 
+/** Canonical step dirs — align with PIPELINE-DESIGN / backend engine (05-clips). */
 const STEP_DIR = {
   "03": "03-assets",
   "04": "04-keyframes",
-  "05": "05-segments",
+  "05": "05-clips",
   "06": "06-voice-sub",
   "07": "07-final",
 };
+
+const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
 const DEFAULT_NEG =
   "deformed hands, extra fingers, watermark, subtitle burn-in, logo spam, inconsistent face across views, blurry, low quality";
@@ -45,11 +52,41 @@ function now() {
 function usage() {
   console.log(`Usage:
   node scripts/ep01-cli.mjs doctor [--base-url http://127.0.0.1:8188]
+  node scripts/ep01-cli.mjs handoff-check --episode EP-01 --version v1
   node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 [--subject char/serena] [--ckpt FILE] [--dry-run] [--seed N]
+  node scripts/ep01-cli.mjs run --episode EP-01 --from 04 --to 07 --version v1 --dry-run
   node scripts/ep01-cli.mjs run --episode EP-01 --from 03 --to 07 --pause-each-step [--version v1]
 
 Env: COMFYUI_BASE_URL (required for generate), optional COMFYUI_API_KEY / COMFYUI_CKPT
-Docs: docs/EP01-LOCAL-GPU-RUN.md · docs/LOCAL-GPU-RUNBOOK.md`);
+Docs: docs/EP01-GPU-AGENT-HANDOFF.md · docs/EP01-LOCAL-GPU-RUN.md · docs/LOCAL-GPU-RUNBOOK.md`);
+}
+
+async function pathExists(p) {
+  try {
+    await fs.access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function listImageFiles(dir) {
+  const out = [];
+  async function walk(d) {
+    let ents;
+    try {
+      ents = await fs.readdir(d, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of ents) {
+      const full = path.join(d, e.name);
+      if (e.isDirectory()) await walk(full);
+      else if (IMAGE_EXT.has(path.extname(e.name).toLowerCase())) out.push(full);
+    }
+  }
+  await walk(dir);
+  return out;
 }
 
 async function ensureBaseUrl(cliBase) {
@@ -64,6 +101,81 @@ async function cmdDoctor() {
   const h = await comfy.health();
   console.log(JSON.stringify({ command: "doctor", ...h, base_url: process.env.COMFYUI_BASE_URL }, null, 2));
   process.exit(h.status === "ok" ? 0 : 1);
+}
+
+/**
+ * Non-GPU handoff probe: step-03 回灌清单 + 04–07 archive readiness.
+ * Does not claim Comfy connected; does not invent images.
+ */
+async function cmdHandoffCheck() {
+  const episode = arg("episode", "EP-01");
+  const version = arg("version", "v1");
+  const step03Root = path.join(REPO_ROOT, "assets", episode, STEP_DIR["03"], version);
+  const paramsPath = path.join(step03Root, "params.json");
+  const report = {
+    command: "handoff-check",
+    episode,
+    version,
+    doc: "docs/EP01-GPU-AGENT-HANDOFF.md",
+    step03: { root: path.relative(REPO_ROOT, step03Root).replace(/\\/g, "/"), subjects: [], missing: [], present: 0, planned: 0 },
+    steps: {},
+    ready_for_human_checkpoint_03: false,
+    dry_run_hint: `node scripts/ep01-cli.mjs run --episode ${episode} --from 04 --to 07 --version ${version} --dry-run`,
+  };
+
+  let params = null;
+  if (await pathExists(paramsPath)) {
+    params = JSON.parse(await fs.readFile(paramsPath, "utf8"));
+    const planned = flattenSubjects(params);
+    report.step03.planned = planned.length;
+    report.step03.images_generated = !!params.images_generated;
+    report.step03.status = params.status || null;
+    for (const sid of planned) {
+      const dest = path.join(step03Root, "outputs", sid);
+      const images = await listImageFiles(dest);
+      const row = { subject: sid, path: path.relative(REPO_ROOT, dest).replace(/\\/g, "/"), images: images.length };
+      report.step03.subjects.push(row);
+      if (images.length) report.step03.present += 1;
+      else report.step03.missing.push(sid);
+    }
+  } else {
+    report.step03.error = `missing ${path.relative(REPO_ROOT, paramsPath).replace(/\\/g, "/")}`;
+  }
+
+  report.ready_for_human_checkpoint_03 =
+    report.step03.planned > 0 &&
+    report.step03.missing.length === 0 &&
+    report.step03.present === report.step03.planned;
+
+  for (const [num, dir] of Object.entries(STEP_DIR)) {
+    const root = path.join(REPO_ROOT, "assets", episode, dir, version);
+    const outputs = path.join(root, "outputs");
+    const hasRoot = await pathExists(root);
+    const hasPrompt = await pathExists(path.join(root, "prompt.md"));
+    const hasParams = await pathExists(path.join(root, "params.json"));
+    const hasOutputs = await pathExists(outputs);
+    let outputEntries = 0;
+    if (hasOutputs) {
+      try {
+        outputEntries = (await fs.readdir(outputs)).length;
+      } catch {
+        outputEntries = 0;
+      }
+    }
+    report.steps[num] = {
+      dir,
+      root: path.relative(REPO_ROOT, root).replace(/\\/g, "/"),
+      exists: hasRoot,
+      prompt_md: hasPrompt,
+      params_json: hasParams,
+      outputs_dir: hasOutputs,
+      outputs_entries: outputEntries,
+    };
+  }
+
+  console.log(JSON.stringify(report, null, 2));
+  // exit 0 always for probe; missing images are listed, not a hard fail (GPU handoff pending)
+  process.exit(0);
 }
 
 function flattenSubjects(params) {
@@ -352,13 +464,83 @@ async function runStep04({ episode, version, onlySubject, dry, seed, ckpt }) {
   return { step: "04", episode, version, results };
 }
 
-async function runStepStub(step, episode, version) {
+async function ensureStepScaffold(stepRoot, step, episode, version, extraParams = {}) {
+  await fs.mkdir(path.join(stepRoot, "outputs"), { recursive: true });
+  const promptPath = path.join(stepRoot, "prompt.md");
+  const paramsPath = path.join(stepRoot, "params.json");
+  const metaPath = path.join(stepRoot, "meta.md");
+  const outputMd = path.join(stepRoot, "output.md");
+
+  if (!(await pathExists(promptPath))) {
+    await fs.writeFile(
+      promptPath,
+      `# ${episode} / step ${step} / ${version}\n\nScaffold only. Real prompts land here when generation is wired.\n`,
+    );
+  }
+  if (!(await pathExists(paramsPath))) {
+    await fs.writeFile(
+      paramsPath,
+      JSON.stringify(
+        {
+          episode,
+          step: STEP_DIR[step],
+          version,
+          status: "dry_run_scaffold",
+          images_generated: false,
+          real_generation: false,
+          cli: "scripts/ep01-cli.mjs",
+          created_at: now(),
+          ...extraParams,
+        },
+        null,
+        2,
+      ) + "\n",
+    );
+  }
+  if (!(await pathExists(metaPath))) {
+    await fs.writeFile(
+      metaPath,
+      `# meta\n\n- status: dry_run_scaffold\n- note: placeholder archive for 04–07 handoff; NOT real generation\n- at: ${now()}\n`,
+    );
+  }
+  if (!(await pathExists(outputMd))) {
+    await fs.writeFile(
+      outputMd,
+      `# output\n\n- status: dry_run_scaffold\n- files: (none — awaiting real generation or manual drop)\n`,
+    );
+  }
+}
+
+async function runStepStub(step, episode, version, { dry = false } = {}) {
   const stepDir = STEP_DIR[step];
+  const stepRoot = path.join(REPO_ROOT, "assets", episode, stepDir, version);
   const msg = {
-    "05": "step 05 (video segments) needs Seedance/Kling/Wan glue + keys — not wired for local one-click yet. Place clips under assets/.../05-segments/<ver>/outputs/ manually or wait for video adapter.",
+    "05": "step 05 (video clips) needs Seedance/Kling/Wan glue + keys — not wired for local one-click yet. Place clips under assets/.../05-clips/<ver>/outputs/ manually or wait for video adapter.",
     "06": "step 06 (voice+sub) needs ElevenLabs (or local TTS) — not wired. Put VO/SRT under assets/.../06-voice-sub/<ver>/ when ready.",
     "07": "step 07 (final edit) needs local edit tool / ffmpeg pipeline — not wired. Export 9:16 final into assets/.../07-final/<ver>/ after maozh2 locks duration/resolution.",
   };
+
+  if (dry) {
+    await ensureStepScaffold(stepRoot, step, episode, version, {
+      handoff: "docs/EP01-GPU-AGENT-HANDOFF.md",
+      detail: msg[step],
+    });
+    // refresh meta to mark this dry-run pass
+    await fs.writeFile(
+      path.join(stepRoot, "meta.md"),
+      `# meta\n\n- status: dry_run_scaffold\n- note: ep01-cli --dry-run scaffold; not real generation\n- at: ${now()}\n`,
+    );
+    return {
+      step,
+      episode,
+      version,
+      status: "dry_run_scaffold",
+      real_generation: false,
+      detail: msg[step],
+      archive: path.relative(REPO_ROOT, stepRoot).replace(/\\/g, "/") + "/",
+    };
+  }
+
   return {
     step,
     episode,
@@ -424,18 +606,23 @@ async function cmdRun() {
     let result;
     if (s === "03") result = await runStep03({ episode, version, onlySubject, dry, seed, ckpt });
     else if (s === "04") result = await runStep04({ episode, version, onlySubject, dry, seed, ckpt });
-    else result = await runStepStub(s, episode, version);
+    else result = await runStepStub(s, episode, version, { dry });
     summary.push(result);
     console.log(JSON.stringify(result, null, 2));
     if (pauseEach && i < end) {
       await pause(`\n[checkpoint] step ${s} done — review outputs, then press Enter for next (or Ctrl+C to stop)... `);
     }
   }
-  const failed = summary.some((r) => (r.results || []).some((x) => x?.error) || r.status === "not_implemented" && from === to && ["05","06","07"].includes(String(from)));
-  // exit 0 if comfy steps produced something; stubs alone when requested exit 2
+
+  if (dry) {
+    console.error(`[dry-run] ok steps ${from}→${to}; no real media written as final. See docs/EP01-GPU-AGENT-HANDOFF.md`);
+    process.exit(0);
+  }
+
+  // honest: single-step stub without dry-run exits 2 (not implemented)
   if (from === to && ["05", "06", "07"].includes(String(from))) process.exit(2);
   if ((summary[0]?.results || []).every((x) => x?.error)) process.exit(1);
-  process.exit(failed && !dry ? 0 : 0); // partial ok — user can --subject retry
+  process.exit(0);
 }
 
 async function main() {
@@ -445,6 +632,7 @@ async function main() {
     process.exit(cmd ? 0 : 2);
   }
   if (cmd === "doctor") return cmdDoctor();
+  if (cmd === "handoff-check") return cmdHandoffCheck();
   if (cmd === "run") return cmdRun();
   console.error(`unknown command: ${cmd}`);
   usage();

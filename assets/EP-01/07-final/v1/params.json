@@ -1,0 +1,12 @@
+{
+  "episode": "EP-01",
+  "step": "07-final",
+  "version": "v1",
+  "status": "dry_run_scaffold",
+  "images_generated": false,
+  "real_generation": false,
+  "cli": "scripts/ep01-cli.mjs",
+  "created_at": "2026-08-06T03:27:21.342Z",
+  "handoff": "docs/EP01-GPU-AGENT-HANDOFF.md",
+  "detail": "step 07 (final edit) needs local edit tool / ffmpeg pipeline — not wired. Export 9:16 final into assets/.../07-final/<ver>/ after maozh2 locks duration/resolution."
+}

@@ -2,7 +2,8 @@
 
 > 目标：本机无 GPU / Cloud Free 无 API 时，在**有显卡的机器**上 `git clone` 本仓库，用仓库 CLI **快速跑通 EP01 生成步（03→07）**。  
 > **人审仍走 checkpoint**：CLI 只负责生成与落盘，不自动跳步；每步产物回传/贴群后，等 maozh2 ✅/✏️/↩️/🔄。  
-> **路径锁定（2026-08-04）**：Comfy Cloud / 付费 API **暂搁**；权威路径 = 本地 GPU + 仓库接入说明 + CLI。
+> **路径锁定（2026-08-04）**：Comfy Cloud / 付费 API **暂搁**；权威路径 = 本地 GPU + 仓库接入说明 + CLI。  
+> **导演本机操作要点 + 步骤03回灌清单**：[`EP01-GPU-AGENT-HANDOFF.md`](./EP01-GPU-AGENT-HANDOFF.md)（MAO-42）。
 
 ## 0. 仓库里已备好的（无需云端）
 
@@ -40,8 +41,14 @@
 目标体验（maozh2 确认）：到有显卡机器后，**少数命令**即可按步生成并落盘。
 
 ```bash
-# 0) 可选：只检查会生成哪些 subject，不连 Comfy、不出图
+# 0) 回灌/接驳自检（不连 Comfy、不出图）
+node scripts/ep01-cli.mjs handoff-check --episode EP-01 --version v1
+
+# 0b) 可选：只检查会生成哪些 subject，不连 Comfy、不出图
 node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --dry-run
+
+# 0c) 无真图时验证 04→07 路径接驳（脚手架，不冒充定稿）
+node scripts/ep01-cli.mjs run --episode EP-01 --from 04 --to 07 --version v1 --dry-run
 
 # 1) 健康检查：本地 ComfyUI 可达
 node scripts/ep01-cli.mjs doctor --base-url http://127.0.0.1:8188
@@ -53,7 +60,7 @@ node scripts/ep01-cli.mjs run --episode EP-01 --step 03 --version v1 --subject c
 
 node scripts/ep01-cli.mjs run --episode EP-01 --step 04 --version v1 --ckpt your-model.safetensors   # 需 03 已有 outputs
 
-# 05–07：命令面已留好；当前诚实返回 not_implemented（缺视频 API / TTS / 成片流水线），勿期望一键出片
+# 05–07：无 --dry-run 时诚实返回 not_implemented（缺视频 API / TTS / 成片流水线），勿期望一键出片
 node scripts/ep01-cli.mjs run --episode EP-01 --step 05 --version v1
 node scripts/ep01-cli.mjs run --episode EP-01 --step 06 --version v1
 node scripts/ep01-cli.mjs run --episode EP-01 --step 07 --version v1
@@ -116,7 +123,7 @@ assets/EP-01/03-assets/v1/outputs/<subject_id>/...
 ### Step 05 — 分段视频
 
 按分镜时长（约 5–12s/镜，总约 148s；若目标 60–90s 先 ✏️ 裁旁白）生成 4–15s 段；首尾帧对齐 04。  
-落盘 `assets/EP-01/05-segments/v1/` → checkpoint。
+落盘 `assets/EP-01/05-clips/v1/` → checkpoint。（目录名与 PIPELINE / 后端 `05-clips` 对齐）
 
 ### Step 06 — 配音字幕
 
@@ -131,10 +138,11 @@ TTS（ElevenLabs 或本机等价）+ 字幕 SRT；节奏对齐分镜 → checkpo
 
 - 每步只推进一档；本地跑完把 `assets/EP-01/<step>/vN/` 整夹 commit/PR，或把图/视频贴群给总控归档。
 - **不伪造**：缺图就标 pending；不要用占位图冒充定稿。
+- 步骤03 完整 subject 回灌清单与接棒表：见 [`EP01-GPU-AGENT-HANDOFF.md`](./EP01-GPU-AGENT-HANDOFF.md)。
 - Cloud 路径仍可选（以后改主意再开）：Standard+ + custom_env 后由工程师健康检查；与本地路径二选一或并行。
 
 ## 4. 已知缺口
 
-- **03 / 04**：本机 ComfyUI + `ep01-cli` 可跑；缺 GPU / 缺 checkpoint 文件则出不了图（不伪造）。
+- **03 / 04**：本机 ComfyUI + `ep01-cli` 可跑；缺 GPU / 缺 checkpoint 文件则出不了图（不伪造）。无 GPU 机用 `--dry-run` / `handoff-check` 验接驳。
 - **05 视频 / 06 TTS / 07 成片**：CLI 入口已留，实现仍待视频模型 Key + TTS + 剪辑链路；在此之前请手工落盘或等下一迭代。
 - 成片目标时长 / 分辨率：仍 soft；草稿跟样片 9:16。
