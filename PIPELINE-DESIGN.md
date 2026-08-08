@@ -55,7 +55,7 @@ maozh2 回复后，总控才执行对应动作。
 - 每步产出存到 `assets/<集号>/<步骤>/<版本>/`，如 `assets/EP-01/04-keyframes/v1/`。
 - 每个版本目录含：`prompt.md`（Prompt）、`params.json`（参数/模型/seed）、`refs/`（参考图）、`output.*`（产出）、`meta.md`（说明/失败原因）。
 - 最新通过版本标记为 `latest`（软链或 README 指针）；历史版本保留以供回退与复用。
-- 跨集复用：03 一致性资产定稿后，作为后续集的基准资产入口。
+- 跨集复用：03 一致性资产定稿后，作为后续集的基准资产入口（落地见 [`docs/SERIES-CONSISTENCY.md`](docs/SERIES-CONSISTENCY.md)：`assets/_series/<series_id>/`）。
 
 ---
 

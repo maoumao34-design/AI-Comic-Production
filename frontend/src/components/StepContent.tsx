@@ -16,7 +16,7 @@ export function StepContent({ version }: { version: StepVersion }) {
     case '02':
       return <Storyboard02View version={version} />
     case '03':
-      return <Assets03View version={version} />
+      return <Assets03View version={version} episodeId={version.episode_id} />
     case '04':
       return <Keyframes04View version={version} />
     case '05':

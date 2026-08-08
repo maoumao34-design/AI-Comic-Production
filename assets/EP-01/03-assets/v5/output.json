@@ -1,0 +1,65 @@
+{
+  "episode_id": "EP-01",
+  "step": "03",
+  "platform": "comfyui",
+  "content": {
+    "assets": [
+      {
+        "asset_id": "char/serena",
+        "kind": "consistency_asset",
+        "label": "char/serena",
+        "output": {
+          "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+          "type": "image"
+        }
+      },
+      {
+        "asset_id": "char/james",
+        "kind": "consistency_asset",
+        "label": "char/james",
+        "output": {
+          "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+          "type": "image"
+        }
+      },
+      {
+        "asset_id": "char/amy",
+        "kind": "consistency_asset",
+        "label": "char/amy",
+        "output": {
+          "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Famy%2Foutput.png",
+          "type": "image"
+        }
+      },
+      {
+        "asset_id": "char/kate",
+        "kind": "consistency_asset",
+        "label": "char/kate",
+        "output": {
+          "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+          "type": "image"
+        }
+      }
+    ]
+  },
+  "params": {
+    "model": "RealVisXL_V5.0_fp16.safetensors",
+    "seed": 478631192,
+    "platform": "comfyui",
+    "series_id": "heiress",
+    "images_generated": true,
+    "subjects_requested": [
+      "char/serena",
+      "char/james",
+      "char/amy",
+      "char/kate"
+    ],
+    "ok": 4,
+    "failed": 0,
+    "reused_from_series": 0,
+    "failures": [],
+    "pack_version": "v4",
+    "note": null,
+    "provider": "comfyui"
+  }
+}

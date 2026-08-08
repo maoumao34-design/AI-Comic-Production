@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "name": "05-clips-wan-i2v-placeholder",
+    "step": "05",
+    "status": "placeholder",
+    "purpose": "本机 Wan 2.1 I2V 草稿路径占位。模型与自定义节点就绪后，替换为可 POST /prompt 的 API graph。",
+    "stack": "docs/PRODUCTION-STACK.md",
+    "target": {
+      "provider": "wan_local",
+      "model": "Wan2.1-I2V-14B-480P GGUF Q4/Q5 或 1.3B fp16",
+      "clip_length_s": "5-8",
+      "aspect": "9:16",
+      "input": "04 keyframe as first frame",
+      "vram": "RTX 5070 Ti 12GB — prefer 1.3B or GGUF + tiled VAE"
+    },
+    "install_checklist": [
+      "下载 Wan2.1 I2V 权重到 ComfyUI/models/diffusion_models 或 unet（按所选节点文档）",
+      "安装 ComfyUI-WanVideoWrapper 或官方 Wan 节点",
+      "把本文件替换为真实 API format graph；引擎通过 VIDEO_PROVIDER=wan_local 调用",
+      "成片质量不够时再锁 Kling/Seedance（勿伪造已连接）"
+    ],
+    "engine_behavior": "platforms/video.mjs health 在检测到本地 Wan 模型目录时返回 degraded/ok；submit 在未换真实 graph 前仍 not_implemented"
+  }
+}

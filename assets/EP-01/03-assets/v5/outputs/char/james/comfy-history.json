@@ -1,0 +1,15 @@
+{
+  "job_id": "a1a9b30c-cac9-432f-b600-e640b8a925a2",
+  "outputs": {
+    "9": {
+      "images": [
+        {
+          "filename": "comic_char_james_00007_.png",
+          "subfolder": "",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "recovered_at": "2026-08-08T10:13:03.380Z"
+}

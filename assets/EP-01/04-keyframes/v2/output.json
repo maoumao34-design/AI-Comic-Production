@@ -1,0 +1,97 @@
+{
+  "episode_id": "EP-01",
+  "step": "04",
+  "content": {
+    "keyframes": [
+      {
+        "frame_id": "S1",
+        "label": "S1",
+        "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `scene/villa-living`  \r Frame: James steps in and takes Serena’s hand; clasped hands foreground, villa bokeh. Calm before the cut. Serena composed."
+      },
+      {
+        "frame_id": "S2",
+        "label": "S2",
+        "prompt_excerpt": "Asset refs: `char/james`, `char/serena`, `expr/serena-controlled`  \r Frame A: James mouth / upper face delivering confession.  \r Frame B: Serena eyes — controlled, no scream.  \r Dialogue sync: “Honey,"
+      },
+      {
+        "frame_id": "S3",
+        "label": "S3",
+        "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `prop/wineglass-white-knuckle`, `scene/villa-living`  \r Frame: Two-shot; Serena’s jaw tightens; white-knuckle grip on wineglass stem."
+      },
+      {
+        "frame_id": "S4",
+        "label": "S4",
+        "prompt_excerpt": "Asset refs: `char/amy`, `costume/amy-campus`, `scene/campus`  \r Frame: Amy on campus path with backpack/books; soft daylight; earnest student energy."
+      },
+      {
+        "frame_id": "S5",
+        "label": "S5",
+        "prompt_excerpt": "Asset refs: `prop/scholarship-letter-100k`, `char/serena` (signature context)  \r Frame: Close-up need-based scholarship award letter showing $100,000 and Serena signature line."
+      },
+      {
+        "frame_id": "S6",
+        "label": "S6",
+        "prompt_excerpt": "Asset refs: `char/james`, `char/serena`, optional `char/amy` flash  \r Frame: James animated mid-shot comparing Amy vs Serena; Serena cold profile; optional street-food flash plate with Amy."
+      },
+      {
+        "frame_id": "S7",
+        "label": "S7",
+        "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `expr/serena-steel`, `scene/villa-living`  \r Frame: Two-shot divorce standoff; James nodding; Serena steel-eyed.  \r Dialogue: “If that’s what you want, then le"
+      },
+      {
+        "frame_id": "S8",
+        "label": "S8",
+        "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-steel`  \r Frame: Extreme CU Serena; eyes go steel; freeze energy.  \r Dialogue: “If you want love so badly, then go live without money. James Miller, the game be"
+      },
+      {
+        "frame_id": "S9",
+        "label": "S9",
+        "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-alone`, `scene/villa-living`  \r Frame: Serena alone in living room; softer ambient; identity VO open (“Her name is Serena Harris…”)."
+      },
+      {
+        "frame_id": "S10",
+        "label": "S10",
+        "prompt_excerpt": "Asset refs: sneakers delivery plate (if generated) / funding UI / `prop/scholarship-letter-100k` / `char/amy`  \r Frames: Fast-cut stills — sneaker box overnight; funding transfer; scholarship signing "
+      },
+      {
+        "frame_id": "S11",
+        "label": "S11",
+        "prompt_excerpt": "Asset refs: `scene/prime-group-skyline`, `char/serena`  \r Frame A: LA skyline / Prime Group towers dusk prestige plate.  \r Frame B: Smash to Serena face (betrayal present)."
+      },
+      {
+        "frame_id": "S12",
+        "label": "S12",
+        "prompt_excerpt": "Asset refs: `char/serena`, `char/kate`, `costume/kate-office`, `prop/phone-split`, `scene/kate-office`  \r Frame: Split composition — Serena at villa desk cold executive; Kate in office with notepad li"
+      },
+      {
+        "frame_id": "S13",
+        "label": "S13",
+        "prompt_excerpt": "Asset refs: `prop/bentley-keys-docs`, `prop/studio-share-papers`  \r Frames: Divorce stamp plate; Bentley keys + ownership papers; studio share certificates stack."
+      },
+      {
+        "frame_id": "S14",
+        "label": "S14",
+        "prompt_excerpt": "Asset refs: `scene/campus`, `prop/scholarship-letter-100k`, `char/amy`  \r Frames: University crest; cancelled scholarship stamp; red never-hire energy (no legible private data spam)."
+      },
+      {
+        "frame_id": "S15",
+        "label": "S15",
+        "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `char/amy`, `scene/villa-window-driveway`  \r Frame: Serena silhouette + reflection on glass; below driveway James kisses Amy; warm villa lights vs cold silhoue"
+      },
+      {
+        "frame_id": "S16",
+        "label": "S16",
+        "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-steel`, `prop/studio-share-papers`, `prop/bentley-keys-docs`  \r Frame A: Ownership evidence plates (Prime Group villa / company Bentley / studio investment).  \r"
+      }
+    ]
+  },
+  "params": {
+    "model": "<prompt_only — 点 🔄 重生触发出图>",
+    "seed": 0,
+    "platform": "comfyui",
+    "images_generated": false,
+    "subjects_planned_count": 16,
+    "pack_version": "v1",
+    "mode": "prompt_only"
+  }
+}

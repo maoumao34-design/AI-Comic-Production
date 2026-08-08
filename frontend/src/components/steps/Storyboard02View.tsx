@@ -23,7 +23,15 @@ interface Storyboard02Content {
 }
 
 export function Storyboard02View({ version }: { version: StepVersion }) {
-  const c = version.content as Storyboard02Content
+  const c = (version.content ?? {}) as Storyboard02Content
+  const shots = Array.isArray(c.shots) ? c.shots : []
+  if (!shots.length) {
+    return (
+      <div className="step-storyboard">
+        <div className="empty">分镜 content.shots 缺失或格式不对；请查看下方产物 / 接手面板中的 output.md</div>
+      </div>
+    )
+  }
   return (
     <div className="step-storyboard">
       <div className="docmeta">
@@ -31,7 +39,7 @@ export function Storyboard02View({ version }: { version: StepVersion }) {
           <div><span className="k">依据解说词</span><span className="v">{c.source_narration.episode} · {c.source_narration.version}</span></div>
         )}
         <div className="row">
-          <span><b>镜头数</b> {c.shots_count ?? c.shots.length}</span>
+          <span><b>镜头数</b> {c.shots_count ?? shots.length}</span>
           <span><b>预估总时长</b> {c.est_total_duration_sec ?? '—'}s</span>
         </div>
       </div>
@@ -41,11 +49,11 @@ export function Storyboard02View({ version }: { version: StepVersion }) {
             <tr><th>镜头号</th><th>旁白</th><th>人物</th><th>动作</th><th>场景</th><th>证据画面</th><th>景别</th><th>时长</th></tr>
           </thead>
           <tbody>
-            {c.shots.map((s) => (
+            {shots.map((s) => (
               <tr key={s.shot_id} id={`shot-${s.shot_id}`}>
                 <td><b>{s.shot_no}</b></td>
                 <td><a className="beatref" href={`#beat-${s.linked_beat_id}`} title="跳到对应旁白">{s.linked_beat_id}</a></td>
-                <td>{s.characters.join('、')}</td>
+                <td>{Array.isArray(s.characters) ? s.characters.join('、') : '—'}</td>
                 <td>{s.action}</td>
                 <td>{s.scene}</td>
                 <td>{s.evidence_visual}</td>

@@ -17,6 +17,8 @@
 
 👉 **[PIPELINE-DESIGN.md](./PIPELINE-DESIGN.md)** — 总控 Agent 的 7 步流水线骨架（每步 checkpoint + 版本归档 + 失败重试）
 
+👉 **[docs/PRODUCTION-STACK.md](./docs/PRODUCTION-STACK.md)** — **本机生产栈锁定**（RealVisXL + Wan 草稿 + ElevenLabs/ffmpeg；对齐样片）
+
 👉 **[docs/AGENT-CARDS.md](./docs/AGENT-CARDS.md)** — 漫剧制作总控 Agent 与 ComfyUI 平台集成工程师的创建卡片
 
 > 所有 agent 接到任务后，请先读 TASK-SPEC / PIPELINE-DESIGN / COLLABORATION，再开始工作。专项需求以 `TASK-SPEC.md` 和后续项目 issue 为准。

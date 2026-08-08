@@ -1,0 +1,15 @@
+{
+  "job_id": "e4d19abb-771e-4c01-8280-f70f37ec90bc",
+  "outputs": {
+    "9": {
+      "images": [
+        {
+          "filename": "comic_char_serena_00008_.png",
+          "subfolder": "",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "recovered_at": "2026-08-08T10:08:37.766Z"
+}

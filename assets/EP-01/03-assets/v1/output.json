@@ -1,0 +1,137 @@
+{
+  "episode_id": "EP-01",
+  "step": "03",
+  "content": {
+    "assets": [
+      {
+        "asset_id": "expr/serena-controlled",
+        "kind": "consistency_asset",
+        "label": "expr/serena-controlled",
+        "prompt_excerpt": "same face ID; jaw set, eyes calm, no scream — confession beat."
+      },
+      {
+        "asset_id": "expr/serena-steel",
+        "kind": "consistency_asset",
+        "label": "expr/serena-steel",
+        "prompt_excerpt": "same face ID; cold resolve CU — “game begins now”."
+      },
+      {
+        "asset_id": "expr/serena-alone",
+        "kind": "consistency_asset",
+        "label": "expr/serena-alone",
+        "prompt_excerpt": "same face ID; private identity monologue, quieter eyes."
+      },
+      {
+        "asset_id": "costume/serena-villa-evening",
+        "kind": "consistency_asset",
+        "label": "costume/serena-villa-evening",
+        "prompt_excerpt": "look A as above (lock for sc1/sc3/sc5)."
+      },
+      {
+        "asset_id": "costume/amy-campus",
+        "kind": "consistency_asset",
+        "label": "costume/amy-campus",
+        "prompt_excerpt": "campus sweater/jeans."
+      },
+      {
+        "asset_id": "costume/kate-office",
+        "kind": "consistency_asset",
+        "label": "costume/kate-office",
+        "prompt_excerpt": "office blouse."
+      },
+      {
+        "asset_id": "scene/villa-living",
+        "kind": "consistency_asset",
+        "label": "scene/villa-living",
+        "prompt_excerpt": "luxury villa living room, floor-to-ceiling glass, warm evening interior."
+      },
+      {
+        "asset_id": "scene/campus",
+        "kind": "consistency_asset",
+        "label": "scene/campus",
+        "prompt_excerpt": "Rivertown University path, soft daylight, books/backpack vibe."
+      },
+      {
+        "asset_id": "scene/prime-group-skyline",
+        "kind": "consistency_asset",
+        "label": "scene/prime-group-skyline",
+        "prompt_excerpt": "modern corporate towers / skyline, dusk, prestige smash-cut plate."
+      },
+      {
+        "asset_id": "scene/kate-office",
+        "kind": "consistency_asset",
+        "label": "scene/kate-office",
+        "prompt_excerpt": "clean modern office desk + phone."
+      },
+      {
+        "asset_id": "scene/villa-window-driveway",
+        "kind": "consistency_asset",
+        "label": "scene/villa-window-driveway",
+        "prompt_excerpt": "glass wall overlooking driveway/garden at night."
+      },
+      {
+        "asset_id": "prop/scholarship-letter-100k",
+        "kind": "consistency_asset",
+        "label": "prop/scholarship-letter-100k",
+        "prompt_excerpt": "formal letter showing $100,000 scholarship + signature line (readable as prop, not OCR-critical)."
+      },
+      {
+        "asset_id": "prop/bentley-keys-docs",
+        "kind": "consistency_asset",
+        "label": "prop/bentley-keys-docs",
+        "prompt_excerpt": "car keys + ownership papers stack."
+      },
+      {
+        "asset_id": "prop/studio-share-papers",
+        "kind": "consistency_asset",
+        "label": "prop/studio-share-papers",
+        "prompt_excerpt": "equity/share transfer documents."
+      },
+      {
+        "asset_id": "prop/wineglass-white-knuckle",
+        "kind": "consistency_asset",
+        "label": "prop/wineglass-white-knuckle",
+        "prompt_excerpt": "hand gripping wineglass stem, knuckles pale."
+      },
+      {
+        "asset_id": "prop/phone-split",
+        "kind": "consistency_asset",
+        "label": "prop/phone-split",
+        "prompt_excerpt": "dual phone UI plate for Serena/Kate split (no legible private data)."
+      },
+      {
+        "asset_id": "char/serena",
+        "kind": "consistency_asset",
+        "label": "char/serena",
+        "prompt_excerpt": "Front / side / back — East-Asian woman mid-20s, elegant bone structure, calm controlled eyes, long dark hair, tailored silk blouse + slim trousers (villa evening look A). Quiet power, not soft romance"
+      },
+      {
+        "asset_id": "char/james",
+        "kind": "consistency_asset",
+        "label": "char/james",
+        "prompt_excerpt": "Front / side / back — Caucasian man early 30s, handsome, expensive casual shirt, wedding-band optional. Polished husband look; later guilt reads in eyes (keep base sheet neutral)."
+      },
+      {
+        "asset_id": "char/amy",
+        "kind": "consistency_asset",
+        "label": "char/amy",
+        "prompt_excerpt": "Front / side / back — Young woman early 20s, campus casual (backpack-ready sweater, jeans), earnest “hardworking student” energy. Soft daylight."
+      },
+      {
+        "asset_id": "char/kate",
+        "kind": "consistency_asset",
+        "label": "char/kate",
+        "prompt_excerpt": "Front / side / back — Professional woman late 20s/early 30s, office blouse, neat hair, competent assistant. Cool office lighting."
+      }
+    ]
+  },
+  "params": {
+    "model": "<prompt_only — 点 🔄 重生触发出图>",
+    "seed": 0,
+    "platform": "comfyui",
+    "images_generated": false,
+    "subjects_planned_count": 20,
+    "pack_version": "v1",
+    "mode": "prompt_only"
+  }
+}

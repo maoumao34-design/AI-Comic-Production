@@ -23,10 +23,14 @@ export type EpisodeStatus = 'draft' | 'in_progress' | 'done' | 'blocked'
 export interface Episode {
   episode_id: string
   title: string
+  /** 同系列跨集一致性资产包 ID（默认 heiress / SERIES_ID） */
+  series_id?: string
   status: EpisodeStatus
   current_step: StepId
   created_at: string
   updated_at: string
+  /** 后端 getEpisode 会带上 runs 摘要（本机 bootstrap 用） */
+  runs?: Array<{ run_id: string; status: string; current_step: StepId }>
 }
 
 /** 步骤版本状态 */
@@ -56,7 +60,8 @@ export interface StepVersion {
   version: string
   is_latest: boolean
   status: StepVersionStatus
-  model?: string
+  /** 多为 string；磁盘导入的 01/02 可能是 {name} 对象，渲染前需 format */
+  model?: string | { name?: string; temperature?: unknown } | null
   seed?: number
   params?: Record<string, unknown>
   artifacts: Artifact[]

@@ -1,0 +1,20 @@
+{
+  "model": "RealVisXL_V5.0_fp16.safetensors",
+  "seed": 597460851,
+  "platform": "comfyui",
+  "series_id": "heiress",
+  "images_generated": true,
+  "subjects_requested": [
+    "char/serena",
+    "char/james",
+    "char/amy",
+    "char/kate"
+  ],
+  "ok": 4,
+  "failed": 0,
+  "reused_from_series": 0,
+  "failures": [],
+  "pack_version": "v3",
+  "note": null,
+  "provider": "comfyui"
+}

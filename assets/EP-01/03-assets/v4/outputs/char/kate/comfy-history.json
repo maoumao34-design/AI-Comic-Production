@@ -1,0 +1,15 @@
+{
+  "job_id": "6ea95dea-fb9b-4153-a187-3ae3fd899fa1",
+  "outputs": {
+    "9": {
+      "images": [
+        {
+          "filename": "comic_char_kate_00006_.png",
+          "subfolder": "",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "recovered_at": "2026-08-08T10:09:23.039Z"
+}

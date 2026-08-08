@@ -64,11 +64,11 @@ export const STEP_PLATFORM_SLOTS = [
   {
     step: "05",
     name: "分段视频",
-    primary: null,
-    candidates: ["seedance", "kling", "wan", "comfyui"],
-    status: "needs_decision",
-    entry: "platforms/video.mjs（多候选）+ 可选 ComfyUI",
-    note: "多平台可选：先讨论再请导演拍板，勿擅自锁死",
+    primary: "wan",
+    candidates: ["wan", "kling", "seedance", "comfyui"],
+    status: "locked",
+    entry: "platforms/video.mjs + workflows/05-clips/wan-i2v（本机草稿）",
+    note: "草稿=本机 Wan I2V；成片质量不够再切 Kling/Seedance（见 docs/PRODUCTION-STACK.md）",
   },
   {
     step: "06",

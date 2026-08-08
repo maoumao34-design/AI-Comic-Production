@@ -75,16 +75,16 @@ const server = createServer(async (req, res) => {
     }
     // GET /episodes/:id/steps/:step/current
     if (m === "GET" && r[0] === "episodes" && r[2] === "steps" && r[4] === "current" && !r[5]) {
-      const v = api.getStepCurrent(r[1], r[3]); if (!v) return fail(res, 404, "no current version");
+      const v = await api.getStepCurrent(r[1], r[3]); if (!v) return fail(res, 404, "no current version");
       return json(res, 200, { version: v });
     }
     // GET /episodes/:id/steps/:step/versions
     if (m === "GET" && r[0] === "episodes" && r[2] === "steps" && r[4] === "versions" && !r[5]) {
-      return json(res, 200, { versions: api.listStepVersions(r[1], r[3]) });
+      return json(res, 200, { versions: await api.listStepVersions(r[1], r[3]) });
     }
     // GET /episodes/:id/steps/:step/versions/:version
     if (m === "GET" && r[0] === "episodes" && r[2] === "steps" && r[4] === "versions" && r[5] && !r[6]) {
-      const v = api.getStepVersion(r[1], r[3], r[5]); if (!v) return fail(res, 404, "version not found");
+      const v = await api.getStepVersion(r[1], r[3], r[5]); if (!v) return fail(res, 404, "version not found");
       return json(res, 200, { version: v });
     }
     // POST /episodes/:id/steps/:step/decision
@@ -109,6 +109,29 @@ const server = createServer(async (req, res) => {
     if (m === "GET" && r[0] === "pipeline" && r[1] === "platforms" && !r[2]) {
       return json(res, 200, api.getPlatformMap());
     }
+    // GET /series — 已知系列 ID 列表
+    if (m === "GET" && r[0] === "series" && !r[1]) {
+      return json(res, 200, { series: await api.listSeriesIds() });
+    }
+    // GET /series/:id/consistency — 系列锁定资产包（跨集参考）
+    if (m === "GET" && r[0] === "series" && r[1] && r[2] === "consistency" && !r[3]) {
+      return json(res, 200, { pack: await api.getSeriesPack(r[1]) });
+    }
+    // GET /series/consistency — 默认系列
+    if (m === "GET" && r[0] === "series" && r[1] === "consistency" && !r[2]) {
+      return json(res, 200, { pack: await api.getSeriesPack() });
+    }
+    // GET /episodes/:id/series-refs — 本集所属系列的锁定参考
+    if (m === "GET" && r[0] === "episodes" && r[2] === "series-refs" && !r[3]) {
+      return json(res, 200, { pack: await api.getEpisodeSeriesRefs(r[1]) });
+    }
+    // PATCH/POST /episodes/:id/series — 改本集所属系列
+    if ((m === "POST" || m === "PATCH") && r[0] === "episodes" && r[2] === "series" && !r[3]) {
+      const b = await readJsonBody(req);
+      if (!b.series_id) return fail(res, 400, "missing series_id");
+      return json(res, 200, { episode: api.setEpisodeSeries(r[1], b.series_id) });
+    }
+    // POST /episodes 已支持 body.series_id（见 createEpisode）
     // GET /episodes/:id/steps/:step/archive — 磁盘归档树（含 outputs/）
     if (m === "GET" && r[0] === "episodes" && r[2] === "steps" && r[4] === "archive" && !r[5]) {
       return json(res, 200, await api.listArchiveTree(r[1], r[3]));
@@ -121,8 +144,16 @@ const server = createServer(async (req, res) => {
       if (!Q.path) return fail(res, 400, "missing ?path=");
       const f = await api.artifact(Q.path);
       if (!f) return fail(res, 404, "artifact not found", Q.path);
-      const ct = Q.path.endsWith(".json") ? "application/json" : (Q.path.endsWith(".png") || Q.path.endsWith(".jpg") ? "application/octet-stream" : "text/plain; charset=utf-8");
-      return send(res, 200, f.buf, { "Content-Type": ct });
+      const lower = Q.path.toLowerCase();
+      let ct = "application/octet-stream";
+      if (lower.endsWith(".json")) ct = "application/json; charset=utf-8";
+      else if (lower.endsWith(".png")) ct = "image/png";
+      else if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) ct = "image/jpeg";
+      else if (lower.endsWith(".webp")) ct = "image/webp";
+      else if (lower.endsWith(".mp4")) ct = "video/mp4";
+      else if (lower.endsWith(".mp3") || lower.endsWith(".wav")) ct = "audio/mpeg";
+      else if (lower.endsWith(".md") || lower.endsWith(".txt")) ct = "text/plain; charset=utf-8";
+      return send(res, 200, f.buf, { "Content-Type": ct, "Cache-Control": "public, max-age=60" });
     }
 
     return fail(res, 404, "route not found", p);
@@ -132,9 +163,19 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, HOST, () => {
-  console.log(`[backend] AI 漫剧可视化产品后端 (MVP) listening on http://${HOST}:${PORT}/api/v1`);
-  console.log(`[backend] contract: docs/BACKEND-API-CONTRACT.md v0.2 | assets: ${api.META.ASSETS_DIR}`);
-  console.log(`[backend] 平台槽: GET /api/v1/pipeline/platforms ；健康: GET /api/v1/health/platforms`);
-  console.log(`[backend] 步骤产物默认占位；真实 Comfy 出图用 ep01-cli / comfy-run-workflow（CLI≠产品）。`);
-});
+async function main() {
+  try {
+    // 重启恢复：集列表 / 当前步 / 审阅指针 / 决策 / 系列（assets/index.json + <ep>/episode.json）
+    await api.loadWorkspace();
+  } catch (e) {
+    console.warn("[backend] loadWorkspace failed:", e?.message || e);
+  }
+  server.listen(PORT, HOST, () => {
+    console.log(`[backend] AI 漫剧可视化产品后端 listening on http://${HOST}:${PORT}/api/v1`);
+    console.log(`[backend] contract: docs/BACKEND-API-CONTRACT.md | assets: ${api.META.ASSETS_DIR}`);
+    console.log(`[backend] 平台槽: GET /api/v1/pipeline/platforms ；健康: GET /api/v1/health/platforms`);
+    console.log(`[backend] 03/04：网页 🔄 重生 → ComfyUI 真实出图（需 COMFYUI_BASE_URL + COMFYUI_CKPT）`);
+    console.log(`[backend] 工作区持久化: assets/index.json + assets/<集>/episode.json`);
+  });
+}
+main();

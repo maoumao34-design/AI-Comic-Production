@@ -13,7 +13,9 @@ import type {
 export interface ComicApi {
   // §4.1 Episode
   listEpisodes(): Promise<Episode[]>
-  createEpisode(input: { episode_id: string; title: string }): Promise<Episode>
+  createEpisode(input: { episode_id: string; title: string; series_id?: string }): Promise<Episode>
+  listSeries?(): Promise<string[]>
+  setEpisodeSeries?(episodeId: string, series_id: string): Promise<Episode>
   getEpisode(episodeId: string): Promise<Episode>
   // §4.2 Run
   startRun(episodeId: string, input?: { from_step?: StepId }): Promise<RunInfo>

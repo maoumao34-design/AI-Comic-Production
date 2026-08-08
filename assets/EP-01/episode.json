@@ -1,0 +1,1685 @@
+{
+  "schema": 1,
+  "saved_at": "2026-08-08T10:17:38.729Z",
+  "episode": {
+    "episode_id": "EP-01",
+    "title": "EP-01 · The Heiress（本地 GPU）",
+    "series_id": "heiress",
+    "status": "in_progress",
+    "current_step": "04",
+    "created_at": "2026-08-08T10:14:22.599Z",
+    "updated_at": "2026-08-08T10:17:38.729Z"
+  },
+  "active_run": {
+    "run_id": "run_01adf627e04b",
+    "episode_id": "EP-01",
+    "status": "paused_at_checkpoint",
+    "current_step": "04",
+    "created_at": "2026-08-08T10:14:22.603Z",
+    "steps": {
+      "01": {
+        "status": "approved",
+        "current_version": "v1",
+        "fail_count": 0,
+        "versions": [
+          {
+            "episode_id": "EP-01",
+            "step": "01",
+            "version": "v1",
+            "is_latest": true,
+            "status": "approved",
+            "model": "disk-import",
+            "seed": 0,
+            "params": {
+              "episode": "EP-01",
+              "step": "01-script",
+              "version": "v1",
+              "created_at": "2026-08-04T03:40:00Z",
+              "author_agent": "漫剧制作总控",
+              "narration_language": "en",
+              "aspect_ratio_draft": "9:16",
+              "source_commit": "d4ea893",
+              "source_files": [
+                "references/scripts/english-script.docx",
+                "references/scripts/chinese-reference.docx"
+              ],
+              "schema": "docs/CONTENT-SCHEMA-01-02.md#01",
+              "decision": {
+                "action": "approve",
+                "operator": "maozh2",
+                "operator_id": "23edb006-9b08-42fa-80df-71bbc1fe1cc7",
+                "at": "2026-08-04T04:18:23Z",
+                "message_id": "ce7c54ce-d28c-4346-8db5-80de399b0d32",
+                "note": "确认 → advance to 02-storyboard"
+              },
+              "source": "disk:EP-01/01-script/v1",
+              "mode": "disk_reload"
+            },
+            "platform": null,
+            "platform_slot": {
+              "primary": null,
+              "candidates": [],
+              "status": "none",
+              "entry": "content schema / 人工或脚本"
+            },
+            "artifacts": [
+              {
+                "type": "text",
+                "label": "01-script/v1",
+                "url": "/api/v1/artifacts?path=EP-01%2F01-script%2Fv1%2Foutput.md",
+                "meta": {
+                  "from_disk": true
+                }
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/01-script/v1/",
+            "prompt_path": "assets/EP-01/01-script/v1/prompt.md",
+            "meta_path": "assets/EP-01/01-script/v1/meta.md",
+            "content": {
+              "step": "01-script",
+              "episode": "EP-01",
+              "title": "The Confession",
+              "version": "v1",
+              "date": "2026-08-04",
+              "narration_language": "en",
+              "one_line_premise": "James confesses he loves sponsored student Amy; Serena answers with divorce, asset reclamation, and the first crack of her hidden heiress identity.",
+              "emotion_arc": {
+                "opening": "controlled calm",
+                "rising": "humiliation / betrayal",
+                "turning": "identity reveal + cold resolve",
+                "closing": "declared war"
+              },
+              "est_duration_sec": 110,
+              "word_count": 528,
+              "word_count_target": {
+                "min": 180,
+                "max": 320,
+                "note": "English VO ~150 wpm; draft runs long (~3.5 min if read full). Trim on revise if target is 60–90s."
+              },
+              "beats_count": 6,
+              "retained_dialogues_count": 3,
+              "source": {
+                "primary": "english_docx",
+                "reference": "chinese_docx",
+                "primary_path": "references/scripts/english-script.docx",
+                "primary_title": "Episode 1",
+                "reference_path": "references/scripts/chinese-reference.docx",
+                "reference_title": "第1集"
+              },
+              "model": {
+                "name": "cursor-grok-4.5 (总控 draft)",
+                "temperature": null
+              },
+              "adaptation": {
+                "boundary_confirmed": false,
+                "policy": "Conservative: spoken glue only; plot unchanged; key dialogues kept verbatim; Chinese stage directions translated into visual_hint only.",
+                "changes": [
+                  "Condensed Serena identity monologue into spoken VO without deleting facts (heiress / Prime Group / scholarship origin).",
+                  "Kate phone orders kept as narration summary (not full multi-line dialogue dump) while preserving all three directives."
+                ]
+              },
+              "open_specs": [
+                "duration",
+                "resolution",
+                "adaptation_boundary"
+              ],
+              "beats": [
+                {
+                  "beat_id": "b1",
+                  "scene_label": "Villa · Confession",
+                  "narration_text": "In their villa, James takes Serena’s hand—and drops the bomb. He says he’s fallen in love with another woman.",
+                  "preserved_dialogue": [
+                    {
+                      "text": "Honey, I’ve fallen in love with another woman.",
+                      "character": "James Miller"
+                    }
+                  ],
+                  "emotion": "calm before the cut",
+                  "visual_hint": "Luxury villa living room; James steps to Serena, takes her hand; Serena’s face still controlled"
+                },
+                {
+                  "beat_id": "b2",
+                  "scene_label": "Betrayal named · Amy",
+                  "narration_text": "The answer cuts deeper than she expects. It’s Amy—the college student they sponsored together. The girl Serena built a hundred-thousand-dollar need-based scholarship for. James calls Amy hardworking, ambitious, sweet—and says she’s so much better than Serena. He complains Serena only threw money at him, while Amy cooked, shared street food, and made him feel like he had a home.",
+                  "preserved_dialogue": [],
+                  "emotion": "humiliation rising",
+                  "visual_hint": "Insert/flash of Amy on campus; scholarship paperwork; James gesturing passionately; Serena listening, jaw tight"
+                },
+                {
+                  "beat_id": "b3",
+                  "scene_label": "Divorce line",
+                  "narration_text": "Serena hears the whole excuse—and draws the line. If that’s what he wants, then let’s get divorced. James agrees. He says he doesn’t want a cent of her property. He’ll stay with Amy and build a life from the ground up. Serena’s reply is ice-cold: if you want love so badly, then go live without money. James Miller, the game begins now.",
+                  "preserved_dialogue": [
+                    {
+                      "text": "If that’s what you want, then let’s get divorced.",
+                      "character": "Serena Harris"
+                    },
+                    {
+                      "text": "If you want love so badly, then go live without money. James Miller, the game begins now.",
+                      "character": "Serena Harris"
+                    }
+                  ],
+                  "emotion": "cold resolve",
+                  "visual_hint": "Two-shot standoff; James confident; Serena’s eyes go steel; end on Serena close-up"
+                },
+                {
+                  "beat_id": "b4",
+                  "scene_label": "Identity monologue",
+                  "narration_text": "Her name is Serena Harris. Married three years. She bought him limited sneakers overnight, secretly poured tens of millions into his business, and even created Amy’s scholarship because he asked. She gave him everything—except the truth. He thought she was a spoiled girl burning family savings on a barely floating company. He never knew she was the daughter of LA’s wealthiest family, that she controlled Prime Group, worth hundreds of billions, that half the commercial properties in this city were hers. She thought this carefully protected, ordinary happiness would last. Until today—when he chose the poor student she had personally sponsored and polished.",
+                  "preserved_dialogue": [],
+                  "emotion": "bitter clarity",
+                  "visual_hint": "Serena alone; flash montage: sneakers delivery, studio funding, scholarship signing, city skyline / Prime Group; smash back to present betrayal"
+                },
+                {
+                  "beat_id": "b5",
+                  "scene_label": "Phone · Orders to Kate",
+                  "narration_text": "Serena picks up the phone. Kate. Three orders, no updates—only results. Draft a divorce: James leaves with nothing; reclaim every property and vehicle under her name, including the Bentley he’s driving, and all shares in his studio—lawyer delivers tomorrow morning. Investigate Amy at Rivertown University; cut the scholarship and her supplementary card; demand a real poverty check. Notify every Prime Group branch and partner: Amy is never to be hired; terminate every partnership with James’s studio and cut all funding. She wants both of them unable to find a single job in this city.",
+                  "preserved_dialogue": [],
+                  "emotion": "executive coldness",
+                  "visual_hint": "Serena at desk with phone; Kate on other end (office); cutaways: divorce papers, Bentley keys, university crest, blacklisted names"
+                },
+                {
+                  "beat_id": "b6",
+                  "scene_label": "Window · Kiss · Vow",
+                  "narration_text": "She hangs up, stands at the floor-to-ceiling window—and watches James kiss Amy downstairs. She designed this villa herself. Six months of decorating. Three years of obsession. Starting today, none of it means a thing. James assumes she’ll leave him the villa, the car, the studio shares. How naive. The villa is under Prime Group. The Bentley is company property. The studio shares were her investment from the start. Time to take it all back. James, didn’t you want love? Then I’ll crush everything you lifted up with your own hands—and show you what your so-called ambition is worth once Amy loses the halo I gave her.",
+                  "preserved_dialogue": [],
+                  "emotion": "declared war",
+                  "visual_hint": "Serena at glass wall looking down; James+Amy kissing at driveway/garden; Serena’s reflection; villa interiors as empty trophies; final Serena close-up"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:14:22.604Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "approve",
+                "note": "hydrated from disk for browse",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.604Z"
+              }
+            ]
+          }
+        ]
+      },
+      "02": {
+        "status": "approved",
+        "current_version": "v1",
+        "fail_count": 0,
+        "versions": [
+          {
+            "episode_id": "EP-01",
+            "step": "02",
+            "version": "v1",
+            "is_latest": true,
+            "status": "approved",
+            "model": "cursor-grok-4.5 (总控 draft)",
+            "seed": 0,
+            "params": {
+              "episode": "EP-01",
+              "step": "02-storyboard",
+              "version": "v1",
+              "created_at": "2026-08-04T04:20:00Z",
+              "author_agent": "漫剧制作总控",
+              "source_narration": {
+                "episode": "EP-01",
+                "version": "v1"
+              },
+              "aspect_ratio_draft": "9:16",
+              "schema": "docs/CONTENT-SCHEMA-01-02.md#02",
+              "shots_count": 16,
+              "est_total_duration_sec": 148,
+              "model": {
+                "name": "cursor-grok-4.5 (总控 draft)",
+                "temperature": null
+              },
+              "decision": {
+                "action": "approve",
+                "operator": "maozh2",
+                "operator_id": "23edb006-9b08-42fa-80df-71bbc1fe1cc7",
+                "at": "2026-08-04T05:42:18Z",
+                "message_id": "b7cb23ec-081a-486c-b4fc-4d8ce9c7bef0",
+                "note": "可以，我确认没问题 → advance to 03-assets"
+              },
+              "source": "disk:EP-01/02-storyboard/v1",
+              "mode": "disk_reload"
+            },
+            "platform": null,
+            "platform_slot": {
+              "primary": null,
+              "candidates": [],
+              "status": "none",
+              "entry": "content schema / 人工或脚本"
+            },
+            "artifacts": [
+              {
+                "type": "text",
+                "label": "02-storyboard/v1",
+                "url": "/api/v1/artifacts?path=EP-01%2F02-storyboard%2Fv1%2Foutput.md",
+                "meta": {
+                  "from_disk": true
+                }
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/02-storyboard/v1/",
+            "prompt_path": "assets/EP-01/02-storyboard/v1/prompt.md",
+            "meta_path": "assets/EP-01/02-storyboard/v1/meta.md",
+            "content": {
+              "step": "02-storyboard",
+              "episode": "EP-01",
+              "version": "v1",
+              "date": "2026-08-04",
+              "title": "The Confession",
+              "source_narration": {
+                "episode": "EP-01",
+                "version": "v1",
+                "step": "01-script",
+                "path": "assets/EP-01/01-script/v1/"
+              },
+              "aspect_ratio_draft": "9:16",
+              "shots_count": 16,
+              "est_total_duration_sec": 148,
+              "open_specs": [
+                "duration",
+                "resolution"
+              ],
+              "schema": "docs/CONTENT-SCHEMA-01-02.md#02",
+              "scenes": [
+                {
+                  "scene_id": "sc1",
+                  "label": "Villa living room · Confession",
+                  "location": "Luxury villa living room (floor-to-ceiling glass)",
+                  "linked_beats": [
+                    "b1",
+                    "b2",
+                    "b3"
+                  ]
+                },
+                {
+                  "scene_id": "sc2",
+                  "label": "Flash inserts · Amy / scholarship / funding",
+                  "location": "Campus / scholarship docs / studio (inserts)",
+                  "linked_beats": [
+                    "b2",
+                    "b4"
+                  ]
+                },
+                {
+                  "scene_id": "sc3",
+                  "label": "Serena alone · Identity monologue",
+                  "location": "Villa interior; city / Prime Group montage",
+                  "linked_beats": [
+                    "b4"
+                  ]
+                },
+                {
+                  "scene_id": "sc4",
+                  "label": "Phone · Orders to Kate",
+                  "location": "Villa desk + Kate office (split)",
+                  "linked_beats": [
+                    "b5"
+                  ]
+                },
+                {
+                  "scene_id": "sc5",
+                  "label": "Window · Kiss · Vow",
+                  "location": "Villa glass wall overlooking driveway/garden",
+                  "linked_beats": [
+                    "b6"
+                  ]
+                }
+              ],
+              "shots": [
+                {
+                  "shot_id": "s1",
+                  "linked_beat_id": "b1",
+                  "shot_no": "S1",
+                  "characters": [
+                    "Serena Harris",
+                    "James Miller"
+                  ],
+                  "action": "James steps to Serena, takes her hand; she stays composed",
+                  "scene": "Luxury villa living room",
+                  "evidence_visual": "Their clasped hands in foreground; soft villa interior bokeh",
+                  "shot_type": "中景",
+                  "duration_sec": 6,
+                  "ref_image_slot": "char/serena+james|scene/villa-living",
+                  "notes": "Open; 9:16 bottom subtitle safe zone; calm before cut"
+                },
+                {
+                  "shot_id": "s2",
+                  "linked_beat_id": "b1",
+                  "shot_no": "S2",
+                  "characters": [
+                    "James Miller",
+                    "Serena Harris"
+                  ],
+                  "action": "James delivers the confession; Serena’s face stays controlled",
+                  "scene": "Luxury villa living room",
+                  "evidence_visual": "James mouth CU on dialogue; cut to Serena eyes reacting without screaming",
+                  "shot_type": "近景",
+                  "duration_sec": 8,
+                  "ref_image_slot": "char/james|char/serena",
+                  "notes": "Retain James line on-screen / VO sync: “Honey, I’ve fallen in love with another woman.”"
+                },
+                {
+                  "shot_id": "s3",
+                  "linked_beat_id": "b2",
+                  "shot_no": "S3",
+                  "characters": [
+                    "Serena Harris",
+                    "James Miller"
+                  ],
+                  "action": "Serena asks who; James answers; her jaw tightens",
+                  "scene": "Luxury villa living room",
+                  "evidence_visual": "Two-shot; Serena’s grip on wineglass / furniture edge white-knuckle",
+                  "shot_type": "中景",
+                  "duration_sec": 7,
+                  "ref_image_slot": "char/serena+james|scene/villa-living",
+                  "notes": "Humiliation rising; no scream"
+                },
+                {
+                  "shot_id": "s4",
+                  "linked_beat_id": "b2",
+                  "shot_no": "S4",
+                  "characters": [
+                    "Amy"
+                  ],
+                  "action": "Flash: Amy on campus, hardworking student look",
+                  "scene": "Rivertown University campus (insert)",
+                  "evidence_visual": "Campus path; Amy with backpack/books; soft daylight",
+                  "shot_type": "全景",
+                  "duration_sec": 5,
+                  "ref_image_slot": "char/amy|scene/campus",
+                  "notes": "Insert; name Amy visually"
+                },
+                {
+                  "shot_id": "s5",
+                  "linked_beat_id": "b2",
+                  "shot_no": "S5",
+                  "characters": [
+                    "Serena Harris",
+                    "Amy"
+                  ],
+                  "action": "Evidence flash of scholarship paperwork Serena funded",
+                  "scene": "Desk / paperwork insert",
+                  "evidence_visual": "Close-up: need-based scholarship award letter, $100,000 figure, Serena signature",
+                  "shot_type": "特写",
+                  "duration_sec": 5,
+                  "ref_image_slot": "prop/scholarship-letter",
+                  "notes": "Evidence beat: she built the scholarship"
+                },
+                {
+                  "shot_id": "s6",
+                  "linked_beat_id": "b2",
+                  "shot_no": "S6",
+                  "characters": [
+                    "James Miller",
+                    "Serena Harris"
+                  ],
+                  "action": "James gestures passionately comparing Amy to Serena; Serena listens cold",
+                  "scene": "Luxury villa living room",
+                  "evidence_visual": "James animated mid-shot; Serena still profile; optional street-food flash with Amy",
+                  "shot_type": "中景",
+                  "duration_sec": 10,
+                  "ref_image_slot": "char/james|char/serena|char/amy",
+                  "notes": "Contrast: money vs homemade care"
+                },
+                {
+                  "shot_id": "s7",
+                  "linked_beat_id": "b3",
+                  "shot_no": "S7",
+                  "characters": [
+                    "Serena Harris",
+                    "James Miller"
+                  ],
+                  "action": "Serena draws the divorce line; James agrees confidently",
+                  "scene": "Luxury villa living room · standoff",
+                  "evidence_visual": "Two-shot standoff; James nodding; Serena steel-eyed",
+                  "shot_type": "中景",
+                  "duration_sec": 9,
+                  "ref_image_slot": "char/serena+james|scene/villa-living",
+                  "notes": "Retain Serena: “If that’s what you want, then let’s get divorced.”"
+                },
+                {
+                  "shot_id": "s8",
+                  "linked_beat_id": "b3",
+                  "shot_no": "S8",
+                  "characters": [
+                    "Serena Harris"
+                  ],
+                  "action": "Serena delivers ice-cold game declaration",
+                  "scene": "Luxury villa living room",
+                  "evidence_visual": "Serena extreme close-up; eyes go steel; end on her face freeze",
+                  "shot_type": "特写",
+                  "duration_sec": 8,
+                  "ref_image_slot": "char/serena",
+                  "notes": "Retain Serena: “If you want love so badly, then go live without money. James Miller, the game begins now.”"
+                },
+                {
+                  "shot_id": "s9",
+                  "linked_beat_id": "b4",
+                  "shot_no": "S9",
+                  "characters": [
+                    "Serena Harris"
+                  ],
+                  "action": "Serena alone; VO identity open; bitter clarity",
+                  "scene": "Villa interior · Serena alone",
+                  "evidence_visual": "Serena standing alone in living room; soft ambient; title-card feel of her name",
+                  "shot_type": "近景",
+                  "duration_sec": 8,
+                  "ref_image_slot": "char/serena|scene/villa-living",
+                  "notes": "VO: Her name is Serena Harris…"
+                },
+                {
+                  "shot_id": "s10",
+                  "linked_beat_id": "b4",
+                  "shot_no": "S10",
+                  "characters": [
+                    "Serena Harris",
+                    "James Miller",
+                    "Amy"
+                  ],
+                  "action": "Montage of what she gave: sneakers overnight, studio funding, scholarship signing",
+                  "scene": "Flash montage (delivery / studio / signing)",
+                  "evidence_visual": "Sneaker box delivery CU; bank/funding transfer UI; scholarship signing with Amy present",
+                  "shot_type": "特写",
+                  "duration_sec": 12,
+                  "ref_image_slot": "prop/sneakers|prop/funding|prop/scholarship-letter|char/amy",
+                  "notes": "Fast cuts; evidence of sacrifice"
+                },
+                {
+                  "shot_id": "s11",
+                  "linked_beat_id": "b4",
+                  "shot_no": "S11",
+                  "characters": [
+                    "Serena Harris"
+                  ],
+                  "action": "Reveal: heiress / Prime Group / city holdings; smash back to betrayal",
+                  "scene": "City skyline + Prime Group HQ insert → villa present",
+                  "evidence_visual": "LA skyline night; Prime Group logo/building; half city commercial map glow; smash to Serena face",
+                  "shot_type": "远景",
+                  "duration_sec": 10,
+                  "ref_image_slot": "scene/prime-group|scene/la-skyline|char/serena",
+                  "notes": "Identity bomb; keep facts: daughter of LA’s wealthiest / Prime Group hundreds of billions"
+                },
+                {
+                  "shot_id": "s12",
+                  "linked_beat_id": "b5",
+                  "shot_no": "S12",
+                  "characters": [
+                    "Serena Harris",
+                    "Kate"
+                  ],
+                  "action": "Serena dials Kate; split: villa desk / Kate office",
+                  "scene": "Villa desk + Kate office",
+                  "evidence_visual": "Phone screen: Kate; Serena cold executive posture; Kate listening with notepad",
+                  "shot_type": "中景",
+                  "duration_sec": 7,
+                  "ref_image_slot": "char/serena|char/kate|prop/phone",
+                  "notes": "Three orders; no updates—only results"
+                },
+                {
+                  "shot_id": "s13",
+                  "linked_beat_id": "b5",
+                  "shot_no": "S13",
+                  "characters": [
+                    "Serena Harris",
+                    "James Miller"
+                  ],
+                  "action": "Order 1 cutaways: divorce draft, reclaim Bentley + studio shares",
+                  "scene": "Evidence inserts (legal / car / studio)",
+                  "evidence_visual": "Divorce papers stamp; Bentley keys/logo; studio share certificates stacked",
+                  "shot_type": "特写",
+                  "duration_sec": 9,
+                  "ref_image_slot": "prop/divorce-papers|prop/bentley|prop/studio-shares",
+                  "notes": "Lawyer delivers tomorrow morning"
+                },
+                {
+                  "shot_id": "s14",
+                  "linked_beat_id": "b5",
+                  "shot_no": "S14",
+                  "characters": [
+                    "Amy",
+                    "Serena Harris"
+                  ],
+                  "action": "Orders 2–3: investigate Amy, cut scholarship/card; blacklist Amy + cut James funding citywide",
+                  "scene": "University crest + blacklist UI inserts",
+                  "evidence_visual": "Rivertown University crest; cancelled scholarship stamp; red ‘never hire’ list with Amy; partner termination emails",
+                  "shot_type": "特写",
+                  "duration_sec": 10,
+                  "ref_image_slot": "scene/campus|prop/scholarship-letter|prop/blacklist",
+                  "notes": "Both unable to find a job in this city"
+                },
+                {
+                  "shot_id": "s15",
+                  "linked_beat_id": "b6",
+                  "shot_no": "S15",
+                  "characters": [
+                    "Serena Harris",
+                    "James Miller",
+                    "Amy"
+                  ],
+                  "action": "Serena at floor-to-ceiling window watches James kiss Amy downstairs",
+                  "scene": "Villa glass wall overlooking driveway/garden",
+                  "evidence_visual": "Serena reflection on glass; below: James+Amy kissing; villa lights warm vs her cold silhouette",
+                  "shot_type": "全景",
+                  "duration_sec": 12,
+                  "ref_image_slot": "char/serena|char/james+amy|scene/villa-window",
+                  "notes": "Emotional peak; designed villa / 6 months / 3 years obsession VO"
+                },
+                {
+                  "shot_id": "s16",
+                  "linked_beat_id": "b6",
+                  "shot_no": "S16",
+                  "characters": [
+                    "Serena Harris"
+                  ],
+                  "action": "Ownership reclaim evidence + final war vow close-up",
+                  "scene": "Villa interiors as empty trophies → Serena CU",
+                  "evidence_visual": "Prime Group deed on villa; company Bentley plate; studio investment docs; final Serena eyes CU",
+                  "shot_type": "近景",
+                  "duration_sec": 12,
+                  "ref_image_slot": "prop/deed|prop/bentley|prop/studio-shares|char/serena",
+                  "notes": "VO vow: crush everything… Amy loses the halo I gave her. End card energy."
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:14:22.605Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "approve",
+                "note": "hydrated from disk for browse",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.605Z"
+              }
+            ]
+          }
+        ]
+      },
+      "03": {
+        "status": "approved",
+        "current_version": "v3",
+        "fail_count": 0,
+        "versions": [
+          {
+            "episode_id": "EP-01",
+            "step": "03",
+            "version": "v1",
+            "is_latest": false,
+            "status": "superseded",
+            "model": "<prompt_only — 点 🔄 重生触发出图>",
+            "seed": 0,
+            "params": {
+              "model": "<prompt_only — 点 🔄 重生触发出图>",
+              "seed": 0,
+              "platform": "comfyui",
+              "images_generated": true,
+              "subjects_planned_count": 20,
+              "pack_version": "v1",
+              "mode": "disk_reload"
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/03-assets/"
+            },
+            "artifacts": [
+              {
+                "type": "image",
+                "label": "char/serena",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv1%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/serena",
+                  "from_pack": true
+                }
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/03-assets/v1/",
+            "prompt_path": "assets/EP-01/03-assets/v1/prompt.md",
+            "meta_path": "assets/EP-01/03-assets/v1/meta.md",
+            "content": {
+              "assets": [
+                {
+                  "asset_id": "char/serena",
+                  "kind": "consistency_asset",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv1%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  }
+                }
+              ],
+              "subjects": [
+                {
+                  "subject_id": "char/serena",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv1%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:14:22.609Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "regenerate",
+                "note": "restored disk outputs after restart",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.609Z"
+              }
+            ]
+          },
+          {
+            "episode_id": "EP-01",
+            "step": "03",
+            "version": "v2",
+            "is_latest": false,
+            "status": "superseded",
+            "model": "RealVisXL_V5.0_fp16.safetensors",
+            "seed": 0,
+            "params": {
+              "model": "RealVisXL_V5.0_fp16.safetensors",
+              "seed": 597460851,
+              "platform": "comfyui",
+              "images_generated": true,
+              "subjects_planned_count": 20,
+              "pack_version": "v2",
+              "mode": "disk_reload"
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/03-assets/"
+            },
+            "artifacts": [
+              {
+                "type": "image",
+                "label": "char/amy",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/amy",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/james",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/james",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/kate",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/kate",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/serena",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/serena",
+                  "from_pack": true
+                }
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/03-assets/v2/",
+            "prompt_path": "assets/EP-01/03-assets/v2/prompt.md",
+            "meta_path": "assets/EP-01/03-assets/v2/meta.md",
+            "content": {
+              "assets": [
+                {
+                  "asset_id": "char/amy",
+                  "kind": "consistency_asset",
+                  "label": "char/amy",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/james",
+                  "kind": "consistency_asset",
+                  "label": "char/james",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/kate",
+                  "kind": "consistency_asset",
+                  "label": "char/kate",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/serena",
+                  "kind": "consistency_asset",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  }
+                }
+              ],
+              "subjects": [
+                {
+                  "subject_id": "char/amy",
+                  "label": "char/amy",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/james",
+                  "label": "char/james",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/kate",
+                  "label": "char/kate",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/serena",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv2%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:14:22.612Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "regenerate",
+                "note": "restored disk outputs after restart",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.612Z"
+              }
+            ]
+          },
+          {
+            "episode_id": "EP-01",
+            "step": "03",
+            "version": "v3",
+            "is_latest": true,
+            "status": "approved",
+            "model": "RealVisXL_V5.0_fp16.safetensors",
+            "seed": 0,
+            "params": {
+              "model": "RealVisXL_V5.0_fp16.safetensors",
+              "seed": 793671138,
+              "platform": "comfyui",
+              "images_generated": true,
+              "subjects_planned_count": 20,
+              "pack_version": "v3",
+              "mode": "disk_reload",
+              "series_promoted": true,
+              "series_id": "heiress",
+              "series_promoted_count": 4,
+              "series_promote_skip_reason": null
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/03-assets/"
+            },
+            "artifacts": [
+              {
+                "type": "image",
+                "label": "char/amy",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/amy",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/james",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/james",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/kate",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/kate",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/serena",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/serena",
+                  "from_pack": true
+                }
+              }
+            ],
+            "refs": [
+              "assets/_series/heiress/subjects/char__amy/output.png",
+              "assets/_series/heiress/subjects/char__james/output.png",
+              "assets/_series/heiress/subjects/char__kate/output.png",
+              "assets/_series/heiress/subjects/char__serena/output.png"
+            ],
+            "archive_path": "assets/EP-01/03-assets/v3/",
+            "prompt_path": "assets/EP-01/03-assets/v3/prompt.md",
+            "meta_path": "assets/EP-01/03-assets/v3/meta.md",
+            "content": {
+              "assets": [
+                {
+                  "asset_id": "char/amy",
+                  "kind": "consistency_asset",
+                  "label": "char/amy",
+                  "status": "locked",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  },
+                  "consistency_ref": "series:heiress/char/amy"
+                },
+                {
+                  "asset_id": "char/james",
+                  "kind": "consistency_asset",
+                  "label": "char/james",
+                  "status": "locked",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  },
+                  "consistency_ref": "series:heiress/char/james"
+                },
+                {
+                  "asset_id": "char/kate",
+                  "kind": "consistency_asset",
+                  "label": "char/kate",
+                  "status": "locked",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  },
+                  "consistency_ref": "series:heiress/char/kate"
+                },
+                {
+                  "asset_id": "char/serena",
+                  "kind": "consistency_asset",
+                  "label": "char/serena",
+                  "status": "locked",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv3%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  },
+                  "consistency_ref": "series:heiress/char/serena"
+                }
+              ],
+              "subjects": [
+                {
+                  "subject_type": "character",
+                  "subject_id": "char/amy",
+                  "label": "char/amy",
+                  "status": "locked",
+                  "consistency_ref": "series:heiress/char/amy",
+                  "consistency_check": {
+                    "passed": true,
+                    "issues": []
+                  },
+                  "output": {
+                    "url": "/api/v1/artifacts?path=_series%2Fheiress%2Fsubjects%2Fchar__amy%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "subject_type": "character",
+                  "subject_id": "char/james",
+                  "label": "char/james",
+                  "status": "locked",
+                  "consistency_ref": "series:heiress/char/james",
+                  "consistency_check": {
+                    "passed": true,
+                    "issues": []
+                  },
+                  "output": {
+                    "url": "/api/v1/artifacts?path=_series%2Fheiress%2Fsubjects%2Fchar__james%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "subject_type": "character",
+                  "subject_id": "char/kate",
+                  "label": "char/kate",
+                  "status": "locked",
+                  "consistency_ref": "series:heiress/char/kate",
+                  "consistency_check": {
+                    "passed": true,
+                    "issues": []
+                  },
+                  "output": {
+                    "url": "/api/v1/artifacts?path=_series%2Fheiress%2Fsubjects%2Fchar__kate%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "subject_type": "character",
+                  "subject_id": "char/serena",
+                  "label": "char/serena",
+                  "status": "locked",
+                  "consistency_ref": "series:heiress/char/serena",
+                  "consistency_check": {
+                    "passed": true,
+                    "issues": []
+                  },
+                  "output": {
+                    "url": "/api/v1/artifacts?path=_series%2Fheiress%2Fsubjects%2Fchar__serena%2Foutput.png",
+                    "type": "image"
+                  }
+                }
+              ],
+              "series_id": "heiress"
+            },
+            "created_at": "2026-08-08T10:14:22.615Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "regenerate",
+                "note": "restored disk outputs after restart",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.615Z"
+              },
+              {
+                "action": "select_version",
+                "note": null,
+                "from": "v5",
+                "to": "v3",
+                "operator": "maozh2",
+                "at": "2026-08-08T10:17:33.702Z",
+                "client_request_id": "7249a36a-c27b-4757-b96e-4deacbf9b26a"
+              },
+              {
+                "action": "approve",
+                "note": null,
+                "params_override": null,
+                "operator": "maozh2",
+                "at": "2026-08-08T10:17:38.705Z"
+              }
+            ]
+          },
+          {
+            "episode_id": "EP-01",
+            "step": "03",
+            "version": "v4",
+            "is_latest": false,
+            "status": "superseded",
+            "model": "RealVisXL_V5.0_fp16.safetensors",
+            "seed": 0,
+            "params": {
+              "model": "RealVisXL_V5.0_fp16.safetensors",
+              "seed": 693983153,
+              "platform": "comfyui",
+              "images_generated": true,
+              "subjects_planned_count": 20,
+              "pack_version": "v4",
+              "mode": "disk_reload"
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/03-assets/"
+            },
+            "artifacts": [
+              {
+                "type": "image",
+                "label": "char/amy",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/amy",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/james",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/james",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/kate",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/kate",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/serena",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/serena",
+                  "from_pack": true
+                }
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/03-assets/v4/",
+            "prompt_path": "assets/EP-01/03-assets/v4/prompt.md",
+            "meta_path": "assets/EP-01/03-assets/v4/meta.md",
+            "content": {
+              "assets": [
+                {
+                  "asset_id": "char/amy",
+                  "kind": "consistency_asset",
+                  "label": "char/amy",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/james",
+                  "kind": "consistency_asset",
+                  "label": "char/james",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/kate",
+                  "kind": "consistency_asset",
+                  "label": "char/kate",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/serena",
+                  "kind": "consistency_asset",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  }
+                }
+              ],
+              "subjects": [
+                {
+                  "subject_id": "char/amy",
+                  "label": "char/amy",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/james",
+                  "label": "char/james",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/kate",
+                  "label": "char/kate",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/serena",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv4%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:14:22.617Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "regenerate",
+                "note": "restored disk outputs after restart",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.617Z"
+              }
+            ]
+          },
+          {
+            "episode_id": "EP-01",
+            "step": "03",
+            "version": "v5",
+            "is_latest": false,
+            "status": "superseded",
+            "model": "RealVisXL_V5.0_fp16.safetensors",
+            "seed": 0,
+            "params": {
+              "model": "RealVisXL_V5.0_fp16.safetensors",
+              "seed": 478631192,
+              "platform": "comfyui",
+              "images_generated": true,
+              "subjects_planned_count": 20,
+              "pack_version": "v5",
+              "mode": "disk_reload"
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/03-assets/"
+            },
+            "artifacts": [
+              {
+                "type": "image",
+                "label": "char/amy",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/amy",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/james",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/james",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/kate",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/kate",
+                  "from_pack": true
+                }
+              },
+              {
+                "type": "image",
+                "label": "char/serena",
+                "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                "meta": {
+                  "subject_id": "char/serena",
+                  "from_pack": true
+                }
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/03-assets/v5/",
+            "prompt_path": "assets/EP-01/03-assets/v5/prompt.md",
+            "meta_path": "assets/EP-01/03-assets/v5/meta.md",
+            "content": {
+              "assets": [
+                {
+                  "asset_id": "char/amy",
+                  "kind": "consistency_asset",
+                  "label": "char/amy",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/james",
+                  "kind": "consistency_asset",
+                  "label": "char/james",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/kate",
+                  "kind": "consistency_asset",
+                  "label": "char/kate",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  }
+                },
+                {
+                  "asset_id": "char/serena",
+                  "kind": "consistency_asset",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  }
+                }
+              ],
+              "subjects": [
+                {
+                  "subject_id": "char/amy",
+                  "label": "char/amy",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Famy%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/james",
+                  "label": "char/james",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fjames%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/kate",
+                  "label": "char/kate",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fkate%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                },
+                {
+                  "subject_id": "char/serena",
+                  "label": "char/serena",
+                  "status": "draft",
+                  "output": {
+                    "url": "/api/v1/artifacts?path=EP-01%2F03-assets%2Fv5%2Foutputs%2Fchar%2Fserena%2Foutput.png",
+                    "type": "image"
+                  },
+                  "subject_type": "character"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:14:22.619Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "regenerate",
+                "note": "restored disk outputs after restart",
+                "operator": "system",
+                "at": "2026-08-08T10:14:22.619Z"
+              }
+            ]
+          }
+        ]
+      },
+      "04": {
+        "status": "awaiting_review",
+        "current_version": "v2",
+        "fail_count": 0,
+        "versions": [
+          {
+            "episode_id": "EP-01",
+            "step": "04",
+            "version": "v1",
+            "is_latest": false,
+            "status": "superseded",
+            "model": "<prompt_only — 点 🔄 重生触发出图>",
+            "seed": 0,
+            "params": {
+              "model": "<prompt_only — 点 🔄 重生触发出图>",
+              "seed": 0,
+              "platform": "comfyui",
+              "images_generated": false,
+              "subjects_planned_count": 16,
+              "pack_version": "v1",
+              "mode": "prompt_only"
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/04-keyframes/"
+            },
+            "artifacts": [],
+            "refs": [],
+            "archive_path": "assets/EP-01/04-keyframes/v1/",
+            "prompt_path": "assets/EP-01/04-keyframes/v1/prompt.md",
+            "meta_path": "assets/EP-01/04-keyframes/v1/meta.md",
+            "content": {
+              "keyframes": [
+                {
+                  "frame_id": "S1",
+                  "label": "S1",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `scene/villa-living`  \r Frame: James steps in and takes Serena’s hand; clasped hands foreground, villa bokeh. Calm before the cut. Serena composed."
+                },
+                {
+                  "frame_id": "S2",
+                  "label": "S2",
+                  "prompt_excerpt": "Asset refs: `char/james`, `char/serena`, `expr/serena-controlled`  \r Frame A: James mouth / upper face delivering confession.  \r Frame B: Serena eyes — controlled, no scream.  \r Dialogue sync: “Honey,"
+                },
+                {
+                  "frame_id": "S3",
+                  "label": "S3",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `prop/wineglass-white-knuckle`, `scene/villa-living`  \r Frame: Two-shot; Serena’s jaw tightens; white-knuckle grip on wineglass stem."
+                },
+                {
+                  "frame_id": "S4",
+                  "label": "S4",
+                  "prompt_excerpt": "Asset refs: `char/amy`, `costume/amy-campus`, `scene/campus`  \r Frame: Amy on campus path with backpack/books; soft daylight; earnest student energy."
+                },
+                {
+                  "frame_id": "S5",
+                  "label": "S5",
+                  "prompt_excerpt": "Asset refs: `prop/scholarship-letter-100k`, `char/serena` (signature context)  \r Frame: Close-up need-based scholarship award letter showing $100,000 and Serena signature line."
+                },
+                {
+                  "frame_id": "S6",
+                  "label": "S6",
+                  "prompt_excerpt": "Asset refs: `char/james`, `char/serena`, optional `char/amy` flash  \r Frame: James animated mid-shot comparing Amy vs Serena; Serena cold profile; optional street-food flash plate with Amy."
+                },
+                {
+                  "frame_id": "S7",
+                  "label": "S7",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `expr/serena-steel`, `scene/villa-living`  \r Frame: Two-shot divorce standoff; James nodding; Serena steel-eyed.  \r Dialogue: “If that’s what you want, then le"
+                },
+                {
+                  "frame_id": "S8",
+                  "label": "S8",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-steel`  \r Frame: Extreme CU Serena; eyes go steel; freeze energy.  \r Dialogue: “If you want love so badly, then go live without money. James Miller, the game be"
+                },
+                {
+                  "frame_id": "S9",
+                  "label": "S9",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-alone`, `scene/villa-living`  \r Frame: Serena alone in living room; softer ambient; identity VO open (“Her name is Serena Harris…”)."
+                },
+                {
+                  "frame_id": "S10",
+                  "label": "S10",
+                  "prompt_excerpt": "Asset refs: sneakers delivery plate (if generated) / funding UI / `prop/scholarship-letter-100k` / `char/amy`  \r Frames: Fast-cut stills — sneaker box overnight; funding transfer; scholarship signing "
+                },
+                {
+                  "frame_id": "S11",
+                  "label": "S11",
+                  "prompt_excerpt": "Asset refs: `scene/prime-group-skyline`, `char/serena`  \r Frame A: LA skyline / Prime Group towers dusk prestige plate.  \r Frame B: Smash to Serena face (betrayal present)."
+                },
+                {
+                  "frame_id": "S12",
+                  "label": "S12",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/kate`, `costume/kate-office`, `prop/phone-split`, `scene/kate-office`  \r Frame: Split composition — Serena at villa desk cold executive; Kate in office with notepad li"
+                },
+                {
+                  "frame_id": "S13",
+                  "label": "S13",
+                  "prompt_excerpt": "Asset refs: `prop/bentley-keys-docs`, `prop/studio-share-papers`  \r Frames: Divorce stamp plate; Bentley keys + ownership papers; studio share certificates stack."
+                },
+                {
+                  "frame_id": "S14",
+                  "label": "S14",
+                  "prompt_excerpt": "Asset refs: `scene/campus`, `prop/scholarship-letter-100k`, `char/amy`  \r Frames: University crest; cancelled scholarship stamp; red never-hire energy (no legible private data spam)."
+                },
+                {
+                  "frame_id": "S15",
+                  "label": "S15",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `char/amy`, `scene/villa-window-driveway`  \r Frame: Serena silhouette + reflection on glass; below driveway James kisses Amy; warm villa lights vs cold silhoue"
+                },
+                {
+                  "frame_id": "S16",
+                  "label": "S16",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-steel`, `prop/studio-share-papers`, `prop/bentley-keys-docs`  \r Frame A: Ownership evidence plates (Prime Group villa / company Bentley / studio investment).  \r"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:15:00.287Z",
+            "duration_ms": 0,
+            "failure": null,
+            "decision_history": [
+              {
+                "action": "regenerate",
+                "note": "restored disk outputs after restart",
+                "operator": "system",
+                "at": "2026-08-08T10:15:00.287Z"
+              }
+            ]
+          },
+          {
+            "episode_id": "EP-01",
+            "step": "04",
+            "version": "v2",
+            "is_latest": false,
+            "status": "awaiting_review",
+            "model": "<prompt_only — 点 🔄 重生触发出图>",
+            "seed": 0,
+            "params": {
+              "model": "<prompt_only — 点 🔄 重生触发出图>",
+              "seed": 0,
+              "platform": "comfyui",
+              "images_generated": false,
+              "subjects_planned_count": 16,
+              "pack_version": "v1",
+              "mode": "prompt_only"
+            },
+            "platform": "comfyui",
+            "platform_slot": {
+              "primary": "comfyui",
+              "candidates": [
+                "comfyui"
+              ],
+              "status": "locked",
+              "entry": "platforms/comfyui.mjs + workflows/04-keyframes/"
+            },
+            "artifacts": [
+              {
+                "type": "json",
+                "label": "Prompt 包（待出图）",
+                "url": "/api/v1/artifacts?path=EP-01%2F04-keyframes%2Fv2%2Foutput.json",
+                "meta": {}
+              }
+            ],
+            "refs": [],
+            "archive_path": "assets/EP-01/04-keyframes/v2/",
+            "prompt_path": "assets/EP-01/04-keyframes/v2/prompt.md",
+            "meta_path": "assets/EP-01/04-keyframes/v2/meta.md",
+            "content": {
+              "keyframes": [
+                {
+                  "frame_id": "S1",
+                  "label": "S1",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `scene/villa-living`  \r Frame: James steps in and takes Serena’s hand; clasped hands foreground, villa bokeh. Calm before the cut. Serena composed."
+                },
+                {
+                  "frame_id": "S2",
+                  "label": "S2",
+                  "prompt_excerpt": "Asset refs: `char/james`, `char/serena`, `expr/serena-controlled`  \r Frame A: James mouth / upper face delivering confession.  \r Frame B: Serena eyes — controlled, no scream.  \r Dialogue sync: “Honey,"
+                },
+                {
+                  "frame_id": "S3",
+                  "label": "S3",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `prop/wineglass-white-knuckle`, `scene/villa-living`  \r Frame: Two-shot; Serena’s jaw tightens; white-knuckle grip on wineglass stem."
+                },
+                {
+                  "frame_id": "S4",
+                  "label": "S4",
+                  "prompt_excerpt": "Asset refs: `char/amy`, `costume/amy-campus`, `scene/campus`  \r Frame: Amy on campus path with backpack/books; soft daylight; earnest student energy."
+                },
+                {
+                  "frame_id": "S5",
+                  "label": "S5",
+                  "prompt_excerpt": "Asset refs: `prop/scholarship-letter-100k`, `char/serena` (signature context)  \r Frame: Close-up need-based scholarship award letter showing $100,000 and Serena signature line."
+                },
+                {
+                  "frame_id": "S6",
+                  "label": "S6",
+                  "prompt_excerpt": "Asset refs: `char/james`, `char/serena`, optional `char/amy` flash  \r Frame: James animated mid-shot comparing Amy vs Serena; Serena cold profile; optional street-food flash plate with Amy."
+                },
+                {
+                  "frame_id": "S7",
+                  "label": "S7",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `expr/serena-steel`, `scene/villa-living`  \r Frame: Two-shot divorce standoff; James nodding; Serena steel-eyed.  \r Dialogue: “If that’s what you want, then le"
+                },
+                {
+                  "frame_id": "S8",
+                  "label": "S8",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-steel`  \r Frame: Extreme CU Serena; eyes go steel; freeze energy.  \r Dialogue: “If you want love so badly, then go live without money. James Miller, the game be"
+                },
+                {
+                  "frame_id": "S9",
+                  "label": "S9",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-alone`, `scene/villa-living`  \r Frame: Serena alone in living room; softer ambient; identity VO open (“Her name is Serena Harris…”)."
+                },
+                {
+                  "frame_id": "S10",
+                  "label": "S10",
+                  "prompt_excerpt": "Asset refs: sneakers delivery plate (if generated) / funding UI / `prop/scholarship-letter-100k` / `char/amy`  \r Frames: Fast-cut stills — sneaker box overnight; funding transfer; scholarship signing "
+                },
+                {
+                  "frame_id": "S11",
+                  "label": "S11",
+                  "prompt_excerpt": "Asset refs: `scene/prime-group-skyline`, `char/serena`  \r Frame A: LA skyline / Prime Group towers dusk prestige plate.  \r Frame B: Smash to Serena face (betrayal present)."
+                },
+                {
+                  "frame_id": "S12",
+                  "label": "S12",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/kate`, `costume/kate-office`, `prop/phone-split`, `scene/kate-office`  \r Frame: Split composition — Serena at villa desk cold executive; Kate in office with notepad li"
+                },
+                {
+                  "frame_id": "S13",
+                  "label": "S13",
+                  "prompt_excerpt": "Asset refs: `prop/bentley-keys-docs`, `prop/studio-share-papers`  \r Frames: Divorce stamp plate; Bentley keys + ownership papers; studio share certificates stack."
+                },
+                {
+                  "frame_id": "S14",
+                  "label": "S14",
+                  "prompt_excerpt": "Asset refs: `scene/campus`, `prop/scholarship-letter-100k`, `char/amy`  \r Frames: University crest; cancelled scholarship stamp; red never-hire energy (no legible private data spam)."
+                },
+                {
+                  "frame_id": "S15",
+                  "label": "S15",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `char/james`, `char/amy`, `scene/villa-window-driveway`  \r Frame: Serena silhouette + reflection on glass; below driveway James kisses Amy; warm villa lights vs cold silhoue"
+                },
+                {
+                  "frame_id": "S16",
+                  "label": "S16",
+                  "prompt_excerpt": "Asset refs: `char/serena`, `expr/serena-steel`, `prop/studio-share-papers`, `prop/bentley-keys-docs`  \r Frame A: Ownership evidence plates (Prime Group villa / company Bentley / studio investment).  \r"
+                }
+              ]
+            },
+            "created_at": "2026-08-08T10:17:38.725Z",
+            "duration_ms": 1,
+            "failure": null,
+            "decision_history": []
+          }
+        ]
+      },
+      "05": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "06": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "07": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "series_id": "heiress",
+  "updated_at": "2026-08-08T10:17:38.722Z",
+  "subjects": {
+    "char/amy": {
+      "subject_id": "char/amy",
+      "subject_type": "character",
+      "consistency_ref": "series:heiress/char/amy",
+      "status": "locked",
+      "source_episode": "EP-01",
+      "source_version": "v3",
+      "source_archive": "assets/EP-01/03-assets/v3/",
+      "image": "_series/heiress/subjects/char__amy/output.png",
+      "promoted_at": "2026-08-08T10:17:38.711Z",
+      "model": "RealVisXL_V5.0_fp16.safetensors",
+      "seed": 0
+    },
+    "char/james": {
+      "subject_id": "char/james",
+      "subject_type": "character",
+      "consistency_ref": "series:heiress/char/james",
+      "status": "locked",
+      "source_episode": "EP-01",
+      "source_version": "v3",
+      "source_archive": "assets/EP-01/03-assets/v3/",
+      "image": "_series/heiress/subjects/char__james/output.png",
+      "promoted_at": "2026-08-08T10:17:38.713Z",
+      "model": "RealVisXL_V5.0_fp16.safetensors",
+      "seed": 0
+    },
+    "char/kate": {
+      "subject_id": "char/kate",
+      "subject_type": "character",
+      "consistency_ref": "series:heiress/char/kate",
+      "status": "locked",
+      "source_episode": "EP-01",
+      "source_version": "v3",
+      "source_archive": "assets/EP-01/03-assets/v3/",
+      "image": "_series/heiress/subjects/char__kate/output.png",
+      "promoted_at": "2026-08-08T10:17:38.715Z",
+      "model": "RealVisXL_V5.0_fp16.safetensors",
+      "seed": 0
+    },
+    "char/serena": {
+      "subject_id": "char/serena",
+      "subject_type": "character",
+      "consistency_ref": "series:heiress/char/serena",
+      "status": "locked",
+      "source_episode": "EP-01",
+      "source_version": "v3",
+      "source_archive": "assets/EP-01/03-assets/v3/",
+      "image": "_series/heiress/subjects/char__serena/output.png",
+      "promoted_at": "2026-08-08T10:17:38.722Z",
+      "model": "RealVisXL_V5.0_fp16.safetensors",
+      "seed": 0
+    }
+  },
+  "source_episodes": [
+    "EP-01"
+  ]
+}

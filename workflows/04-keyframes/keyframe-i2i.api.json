@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "name": "04-keyframes-i2i-api",
+    "step": "04",
+    "purpose": "关键帧：以 03 一致性资产为参考做 img2img，锁定脸/场景后再写镜头内容。",
+    "stack": "docs/PRODUCTION-STACK.md",
+    "notes": [
+      "节点 10 LoadImage.image 需为 ComfyUI input/ 下的文件名；CLI/引擎会先 upload 参考图再填此字段。",
+      "denoise 0.55–0.7：保脸改动作/构图。meta.role 供换 prompt。",
+      "无参考图时引擎回退到 03 character-sheet txt2img。"
+    ],
+    "model_placeholder": "RealVisXL_V5.0_fp16.safetensors",
+    "requires_upload": ["10"]
+  },
+  "3": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "RealVisXL_V5.0_fp16.safetensors"
+    }
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "REPLACE_REF_IMAGE.png"
+    },
+    "meta": { "role": "ref_image" }
+  },
+  "11": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": ["10", 0],
+      "vae": ["3", 2]
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "photorealistic cinematic still, vertical 9:16, same face identity as reference, natural skin, film lighting, shallow depth of field, dramatic storytelling frame",
+      "clip": ["3", 1]
+    },
+    "meta": { "role": "positive" }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "cartoon, anime, comic, illustration, different face, identity drift, watermark, subtitle, text, logo, deformed hands, blurry, low quality",
+      "clip": ["3", 1]
+    },
+    "meta": { "role": "negative" }
+  },
+  "7": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "steps": 28,
+      "cfg": 5.5,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 0.62,
+      "model": ["3", 0],
+      "positive": ["4", 0],
+      "negative": ["5", 0],
+      "latent_image": ["11", 0]
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["7", 0],
+      "vae": ["3", 2]
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "EP01_04_kf",
+      "images": ["8", 0]
+    }
+  }
+}

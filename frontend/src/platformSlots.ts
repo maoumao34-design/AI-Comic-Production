@@ -62,10 +62,10 @@ export const STEP_PLATFORM_SLOTS: Record<StepId, StepPlatformSlot> = {
   },
   '05': {
     step: '05',
-    primary: SEEDANCE,
-    candidates: [SEEDANCE, KLING, WAN, COMFY],
-    discussFirst: true,
-    note: '分段视频多平台候选未锁定。选前先讨论；拿不准找导演确认。选定后经 decision.params_override.provider 下发。',
+    primary: WAN,
+    candidates: [WAN, KLING, SEEDANCE, COMFY],
+    discussFirst: false,
+    note: '草稿锁定本机 Wan I2V；成片可经 params_override.provider 切 Kling/Seedance（见 docs/PRODUCTION-STACK.md）。',
   },
   '06': {
     step: '06',

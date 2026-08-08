@@ -18,7 +18,14 @@ export function VersionBrowser({
   onSelectVersion?: (v: StepVersion) => void
   busy?: boolean
 }) {
-  const sorted = [...versions].sort((a, b) => (a.version < b.version ? 1 : -1))
+  // 同名 vN 去重（后端曾用数组长度发号导致两个 v3；点一个会一起亮）
+  const byVer = new Map<string, StepVersion>()
+  for (const v of versions) byVer.set(v.version, v)
+  const sorted = [...byVer.values()].sort((a, b) => {
+    const na = Number(String(a.version).replace(/^v/i, '')) || 0
+    const nb = Number(String(b.version).replace(/^v/i, '')) || 0
+    return nb - na
+  })
   const viewing = preview ?? current
   const canSelect =
     !!onSelectVersion &&
@@ -30,14 +37,14 @@ export function VersionBrowser({
 
   return (
     <div className="version-browser">
-      <div className="vb-head">版本归档（{versions.length}）</div>
+      <div className="vb-head">版本归档（{sorted.length}）</div>
       {sorted.length === 0 && <div className="empty">该步暂无版本</div>}
       <ul>
         {sorted.map((v) => {
           const isPreview = viewing?.version === v.version
           const isReview = current?.version === v.version
           return (
-            <li key={v.version} className={isPreview ? 'active' : ''}>
+            <li key={`${v.version}:${v.archive_path || ''}`} className={isPreview ? 'active' : ''}>
               <button type="button" onClick={() => onPreview(v)}>
                 <span className="vtag">
                   {v.version}

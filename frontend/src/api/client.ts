@@ -49,8 +49,19 @@ class RealApi implements ComicApi {
     const j = await this.req<{ episodes: Episode[] }>('/episodes')
     return j.episodes
   }
-  async createEpisode(input: { episode_id: string; title: string }): Promise<Episode> {
+  async createEpisode(input: { episode_id: string; title: string; series_id?: string }): Promise<Episode> {
     const j = await this.req<{ episode: Episode }>('/episodes', { method: 'POST', body: JSON.stringify(input) })
+    return j.episode
+  }
+  async listSeries(): Promise<string[]> {
+    const j = await this.req<{ series: string[] }>('/series')
+    return j.series ?? []
+  }
+  async setEpisodeSeries(episodeId: string, series_id: string): Promise<Episode> {
+    const j = await this.req<{ episode: Episode }>(`/episodes/${episodeId}/series`, {
+      method: 'POST',
+      body: JSON.stringify({ series_id }),
+    })
     return j.episode
   }
   async getEpisode(id: string): Promise<Episode> {

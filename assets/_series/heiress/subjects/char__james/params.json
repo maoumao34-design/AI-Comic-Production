@@ -1,0 +1,14 @@
+{
+  "platform": "comfyui",
+  "base_url": "http://127.0.0.1:8188",
+  "mode": "local",
+  "job_id": "f3d72611-d5d2-4327-bb71-2a8ce31e880f",
+  "client_id": "34b03468-a093-4c98-a202-41b04f4d9fb6",
+  "queue_number": 18,
+  "submitted_at": "2026-08-08T10:02:41.621Z",
+  "subject_id": "char/james",
+  "seed": 793671139,
+  "positive": "vertical 9:16 safe framing · photorealistic cinematic · natural skin texture · shallow depth of field · film lighting · consistent face/body across views · soft luxury evening light unless noted · no text overlays · no watermark · no cartoon/anime/photoreal look.. subject_id=char/james. Front / side / back — Caucasian man early 30s, handsome, expensive casual shirt, wedding-band optional. Polished husband look; later guilt reads in eyes (keep base sheet neutral).. photorealistic cinematic drama still, vertical composition, high detail",
+  "negative": "deformed hands, extra fingers, watermark, subtitle burn-in, logo spam, inconsistent face across views.",
+  "ref_image": null
+}

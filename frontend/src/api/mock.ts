@@ -113,11 +113,30 @@ class MockApi implements ComicApi {
     await delay(120)
     return structuredClone(this.episodes)
   }
-  async createEpisode(input: { episode_id: string; title: string }): Promise<Episode> {
+  async createEpisode(input: { episode_id: string; title: string; series_id?: string }): Promise<Episode> {
     await delay(150)
     if (this.episodes.some((e) => e.episode_id === input.episode_id)) throw new Error(`episode ${input.episode_id} 已存在`)
-    const e: Episode = { episode_id: input.episode_id, title: input.title, status: 'draft', current_step: '01', created_at: now(), updated_at: now() }
+    const e: Episode = {
+      episode_id: input.episode_id,
+      title: input.title,
+      series_id: input.series_id || 'default',
+      status: 'draft',
+      current_step: '01',
+      created_at: now(),
+      updated_at: now(),
+    }
     this.episodes.push(e)
+    return structuredClone(e)
+  }
+  async listSeries(): Promise<string[]> {
+    await delay(40)
+    return [...new Set(this.episodes.map((e) => e.series_id || 'default'))]
+  }
+  async setEpisodeSeries(episodeId: string, series_id: string): Promise<Episode> {
+    await delay(80)
+    const e = this.epi(episodeId)
+    e.series_id = series_id
+    e.updated_at = now()
     return structuredClone(e)
   }
   async getEpisode(episodeId: string): Promise<Episode> {

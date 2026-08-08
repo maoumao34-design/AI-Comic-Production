@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "saved_at": "2026-08-08T10:14:22.623Z",
+  "episode": {
+    "episode_id": "EP-99",
+    "title": "EP-99",
+    "series_id": "heiress",
+    "status": "in_progress",
+    "current_step": "03",
+    "created_at": "2026-08-08T10:14:22.621Z",
+    "updated_at": "2026-08-08T10:14:22.621Z"
+  },
+  "active_run": {
+    "run_id": "run_aef276edea17",
+    "episode_id": "EP-99",
+    "status": "paused_at_checkpoint",
+    "current_step": "03",
+    "created_at": "2026-08-08T10:14:22.622Z",
+    "steps": {
+      "01": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "02": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "03": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "04": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "05": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "06": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      },
+      "07": {
+        "status": "pending",
+        "current_version": null,
+        "fail_count": 0,
+        "versions": []
+      }
+    }
+  }
+}

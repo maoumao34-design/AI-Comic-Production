@@ -1,0 +1,24 @@
+{
+  "episode_id": "EP-01",
+  "step": "02",
+  "platform": null,
+  "content": {
+    "shots": [
+      {
+        "shot_id": "s1",
+        "linked_beat_id": "b1",
+        "scene": "（占位场景）"
+      }
+    ]
+  },
+  "params": {
+    "model": "<占位：02 无外部生成平台>",
+    "seed": 326247033,
+    "platform": null,
+    "platform_slot": {
+      "primary": null,
+      "candidates": [],
+      "status": "none"
+    }
+  }
+}

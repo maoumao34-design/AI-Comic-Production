@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Component, useCallback, useEffect, useState, type ErrorInfo, type ReactNode } from 'react'
 import { api, USING_MOCK } from './api'
 import type { Episode, RunInfo, StepVersion, StepId, DecisionAction, PlatformHealth } from './types'
 import { STEP_LABELS } from './types'
@@ -19,22 +19,47 @@ export default function App() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | undefined>(undefined)
   const [health, setHealth] = useState<PlatformHealth | undefined>(undefined)
+  const [seriesOptions, setSeriesOptions] = useState<string[]>(['heiress', 'default'])
 
   const pushLog = useCallback((kind: 'user' | 'system', text: string) => {
     setLog((l) => [...l.slice(-80), { id: uid(), ts: ts(), kind, text }])
+  }, [])
+
+  /** 挂上该集最新 run（本机 bootstrap 已预创建，不必再点「发起 run」） */
+  const attachLatestRun = useCallback(async (episodeId: string) => {
+    try {
+      const ep = await api.getEpisode(episodeId)
+      const last = ep.runs?.[ep.runs.length - 1]
+      if (last?.run_id) {
+        const r = await api.getRun(last.run_id)
+        setRun(r)
+        return r
+      }
+    } catch {
+      /* ignore */
+    }
+    setRun(undefined)
+    return undefined
   }, [])
 
   // 初始加载：集列表 + 平台健康
   useEffect(() => {
     (async () => {
       try {
-        const [eps, h] = await Promise.all([api.listEpisodes(), api.getPlatformHealth()])
+        const [eps, h, series] = await Promise.all([
+          api.listEpisodes(),
+          api.getPlatformHealth(),
+          api.listSeries?.().catch(() => ['heiress', 'default']) ?? Promise.resolve(['heiress', 'default']),
+        ])
         setEpisodes(eps)
         setHealth(h)
+        if (series?.length) setSeriesOptions(series)
         if (eps.length > 0 && !currentId) {
           const first = eps.find((e) => e.status === 'in_progress') ?? eps[0]
           setCurrentId(first.episode_id)
           setFocusStep(first.current_step)
+          await attachLatestRun(first.episode_id)
+          pushLog('system', `已加载 ${first.episode_id} · 当前步骤 ${STEP_LABELS[first.current_step]}。步骤 03/04 点 🔄 重生即可本地 ComfyUI 出图。`)
         }
       } catch (e) {
         setErr(String(e))
@@ -67,19 +92,36 @@ export default function App() {
   const onSelectEpisode = async (id: string) => {
     setCurrentId(id)
     const ep = await api.getEpisode(id)
+    setEpisodes((list) => list.map((x) => (x.episode_id === id ? { ...x, ...ep } : x)))
     setFocusStep(ep.current_step)
-    setRun(undefined)
-    pushLog('system', `切换到 ${id} · ${ep.title}`)
+    await attachLatestRun(id)
+    pushLog('system', `切换到 ${id} · ${ep.title}${ep.series_id ? ` · series:${ep.series_id}` : ''}`)
   }
 
-  const onCreateEpisode = async (id: string, title: string) => {
+  const onCreateEpisode = async (id: string, title: string, seriesId: string) => {
     setBusy(true)
     try {
-      const e = await api.createEpisode({ episode_id: id, title })
+      const e = await api.createEpisode({ episode_id: id, title, series_id: seriesId })
       setEpisodes((x) => [...x, e])
       setCurrentId(id)
       setFocusStep(e.current_step)
-      pushLog('system', `新建集 ${id} · ${title}`)
+      setSeriesOptions((s) => (s.includes(seriesId) ? s : [...s, seriesId].sort()))
+      pushLog('system', `新建集 ${id} · ${title} · series:${seriesId}`)
+    } catch (e) {
+      setErr(String(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const onSetSeries = async (seriesId: string) => {
+    if (!currentId || !api.setEpisodeSeries) return
+    setBusy(true)
+    try {
+      const e = await api.setEpisodeSeries(currentId, seriesId)
+      setEpisodes((list) => list.map((x) => (x.episode_id === e.episode_id ? { ...x, ...e } : x)))
+      setSeriesOptions((s) => (s.includes(seriesId) ? s : [...s, seriesId].sort()))
+      pushLog('system', `${currentId} 已切换到系列 ${seriesId}`)
     } catch (e) {
       setErr(String(e))
     } finally {
@@ -149,9 +191,27 @@ export default function App() {
         <div className="brand">🎬 AI 漫剧制作 · 可视化产品</div>
         <div className="top-right">
           <span className={`badge ${USING_MOCK ? 'mock' : 'live'}`}>{USING_MOCK ? 'MOCK 后端' : 'LIVE 后端'}</span>
-          {currentEpisode && <span className="ep-tag">{currentEpisode.episode_id} · {currentEpisode.title}</span>}
+          {currentEpisode && (
+            <span className="ep-tag">
+              {currentEpisode.episode_id} · {currentEpisode.title}
+              {currentEpisode.series_id ? ` · series:${currentEpisode.series_id}` : ''}
+            </span>
+          )}
           {run && <span className={`st st-${run.status}`}>run: {run.status}</span>}
-          {health && <span className="muted">平台: {Object.entries(health).map(([k, v]) => `${k}=${typeof v === 'string' ? v : (v as { status: string }).status}`).join(' · ')}</span>}
+          {health && (
+            <span className="muted">
+              平台:{' '}
+              {(['comfyui', 'video_models', 'elevenlabs', 'local_compose', 'overall'] as const)
+                .map((k) => {
+                  const v = (health as Record<string, unknown>)[k]
+                  if (typeof v === 'string') return `${k}=${v}`
+                  if (v && typeof v === 'object' && 'status' in v) return `${k}=${String((v as { status: string }).status)}`
+                  return null
+                })
+                .filter(Boolean)
+                .join(' · ')}
+            </span>
+          )}
         </div>
       </header>
 
@@ -163,22 +223,72 @@ export default function App() {
             episodes={episodes}
             current={currentEpisode}
             run={run}
+            focusStep={focusStep}
             log={log}
             busy={busy}
+            seriesOptions={seriesOptions}
             onSelectEpisode={onSelectEpisode}
             onCreateEpisode={onCreateEpisode}
+            onSetSeries={onSetSeries}
             onStartRun={onStartRun}
-            onJumpStep={(s) => { setFocusStep(s); if (currentId) loadStep(currentId, s) }}
+            onJumpStep={(s) => { setFocusStep(s); if (currentId) void loadStep(currentId, s) }}
           />
         </section>
         <section className="right">
           {curVersion ? (
-            <StepView current={curVersion} versions={versions} busy={busy} health={health} onDecision={onDecision} onSelectVersion={onSelectVersion} />
+            <ErrorBoundary key={`${curVersion.episode_id}-${curVersion.step}-${curVersion.version}`} onReset={() => setErr(undefined)}>
+              <StepView
+                current={curVersion}
+                versions={versions}
+                busy={busy}
+                health={health}
+                browsing={!!(run && focusStep && focusStep !== run.current_step)}
+                onDecision={onDecision}
+                onSelectVersion={onSelectVersion}
+              />
+            </ErrorBoundary>
           ) : (
-            <div className="empty big">在左侧选择/新建一集并发起 run，工作区会展示当前 checkpoint。</div>
+            <div className="empty big">
+              {focusStep
+                ? `步骤 ${STEP_LABELS[focusStep]} 暂无版本可显示。可点左侧其它步骤，或回到流水线当前步。`
+                : '在左侧选择/新建一集并发起 run，工作区会展示当前 checkpoint。若刚回退，点左侧步骤或刷新页面即可。'}
+            </div>
           )}
         </section>
       </main>
     </div>
   )
+}
+
+/** 避免单步渲染异常导致整页黑屏 */
+class ErrorBoundary extends Component<{ children: ReactNode; onReset?: () => void }, { error?: string }> {
+  state: { error?: string } = {}
+  static getDerivedStateFromError(err: unknown) {
+    return { error: err instanceof Error ? err.message : String(err) }
+  }
+  componentDidCatch(err: Error, info: ErrorInfo) {
+    console.error('[StepView crash]', err, info.componentStack)
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="empty big">
+          <p>工作区渲染出错（常见于回退后字段类型不匹配），页面未死锁。</p>
+          <p className="muted mono">{this.state.error}</p>
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              this.setState({ error: undefined })
+              this.props.onReset?.()
+              window.location.reload()
+            }}
+          >
+            刷新恢复
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }

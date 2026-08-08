@@ -1,0 +1,14 @@
+{
+  "platform": "comfyui",
+  "base_url": "http://127.0.0.1:8188",
+  "mode": "local",
+  "job_id": "ed5f2f0c-6762-4088-99b6-7465c9718e81",
+  "client_id": "962c4bbd-6d21-4440-878e-947e83f7a43b",
+  "queue_number": 23,
+  "submitted_at": "2026-08-08T10:08:52.858Z",
+  "subject_id": "char/amy",
+  "seed": 693983155,
+  "positive": "vertical 9:16 safe framing · photorealistic cinematic · natural skin texture · shallow depth of field · film lighting · consistent face/body across views · soft luxury evening light unless noted · no text overlays · no watermark · no cartoon/anime/photoreal look.. subject_id=char/amy. Front / side / back — Young woman early 20s, campus casual (backpack-ready sweater, jeans), earnest “hardworking student” energy. Soft daylight.. photorealistic cinematic drama still, vertical composition, high detail",
+  "negative": "deformed hands, extra fingers, watermark, subtitle burn-in, logo spam, inconsistent face across views.",
+  "ref_image": null
+}

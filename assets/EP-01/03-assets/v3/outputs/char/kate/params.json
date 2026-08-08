@@ -1,0 +1,14 @@
+{
+  "platform": "comfyui",
+  "base_url": "http://127.0.0.1:8188",
+  "mode": "local",
+  "job_id": "02216d5d-c6c4-4f27-85d6-0857ccc5575e",
+  "client_id": "e568ba15-e344-4636-ba02-528cfa8db393",
+  "queue_number": 20,
+  "submitted_at": "2026-08-08T10:03:11.875Z",
+  "subject_id": "char/kate",
+  "seed": 793671141,
+  "positive": "vertical 9:16 safe framing · photorealistic cinematic · natural skin texture · shallow depth of field · film lighting · consistent face/body across views · soft luxury evening light unless noted · no text overlays · no watermark · no cartoon/anime/photoreal look.. subject_id=char/kate. Front / side / back — Professional woman late 20s/early 30s, office blouse, neat hair, competent assistant. Cool office lighting.. photorealistic cinematic drama still, vertical composition, high detail",
+  "negative": "deformed hands, extra fingers, watermark, subtitle burn-in, logo spam, inconsistent face across views.",
+  "ref_image": null
+}

@@ -198,6 +198,39 @@ export function listOutputImages(outputs) {
   return files;
 }
 
+/**
+ * uploadImage — 上传本地文件到 ComfyUI input/，供 LoadImage 引用
+ * @returns {{ name: string, subfolder?: string, type?: string }}
+ */
+export async function uploadImage(localPath, { filename = null, overwrite = true } = {}) {
+  const { base, apiKey } = cfg();
+  if (!base) throw Object.assign(new Error("COMFYUI_BASE_URL 未配置"), { code: "unconfigured" });
+  const buf = await fs.readFile(localPath);
+  const name = filename || path.basename(localPath);
+  const form = new FormData();
+  form.append("image", new Blob([buf]), name);
+  form.append("overwrite", overwrite ? "true" : "false");
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), 60_000);
+  try {
+    const h = {};
+    if (apiKey) h["X-API-Key"] = apiKey;
+    const res = await fetch(`${base}/upload/image`, { method: "POST", headers: h, body: form, signal: ac.signal });
+    const text = await res.text();
+    let json = null;
+    try { json = text ? JSON.parse(text) : null; } catch { /* */ }
+    if (!res.ok) {
+      throw Object.assign(new Error(`ComfyUI upload failed HTTP ${res.status}: ${text.slice(0, 200)}`), {
+        code: "upload_failed",
+        status: res.status,
+      });
+    }
+    return { name: json?.name || name, subfolder: json?.subfolder || "", type: json?.type || "input" };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 /** 下载单张图到 Buffer */
 export async function downloadImage({ filename, subfolder = "", type = "output" }) {
   const { base, apiKey } = cfg();
@@ -283,4 +316,4 @@ export async function retry(workflow, newParams = {}) {
 }
 
 export const LOCAL_DEFAULT_BASE = DEFAULT_LOCAL;
-export default { isConfigured, health, submit, record, poll, wait, recover, retry, listOutputImages, downloadImage };
+export default { isConfigured, health, submit, record, poll, wait, recover, retry, listOutputImages, downloadImage, uploadImage };

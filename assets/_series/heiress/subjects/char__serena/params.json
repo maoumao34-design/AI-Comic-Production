@@ -1,0 +1,14 @@
+{
+  "platform": "comfyui",
+  "base_url": "http://127.0.0.1:8188",
+  "mode": "local",
+  "job_id": "747e9e7f-b762-4542-834b-a00396afa910",
+  "client_id": "748c83e7-5bb3-424f-b9f4-7997e974215c",
+  "queue_number": 17,
+  "submitted_at": "2026-08-08T10:02:26.542Z",
+  "subject_id": "char/serena",
+  "seed": 793671138,
+  "positive": "vertical 9:16 safe framing · photorealistic cinematic · natural skin texture · shallow depth of field · film lighting · consistent face/body across views · soft luxury evening light unless noted · no text overlays · no watermark · no cartoon/anime/photoreal look.. subject_id=char/serena. Front / side / back — East-Asian woman mid-20s, elegant bone structure, calm controlled eyes, long dark hair, tailored silk blouse + slim trousers (villa evening look A). Quiet power, not soft romance. Same face across three views. Neutral standing pose, full body + headroom for crop.. photorealistic cinematic drama still, vertical composition, high detail",
+  "negative": "deformed hands, extra fingers, watermark, subtitle burn-in, logo spam, inconsistent face across views.",
+  "ref_image": null
+}
